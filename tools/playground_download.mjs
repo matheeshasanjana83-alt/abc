@@ -152,6 +152,10 @@ async function main() {
     console.log("NO_DIRECT_URL");
     process.exit(4);
   }
+  // API returns a protocol-relative URL (//dl1.gamedl.ru/...). Normalize it.
+  if (downloadUrl.startsWith("//")) downloadUrl = "https:" + downloadUrl;
+  else if (downloadUrl.startsWith("http://")) downloadUrl = downloadUrl.replace(/^http:/, "https:");
+  console.log("Normalized download URL:", downloadUrl);
 
   console.log("Downloading from", downloadUrl);
   await download(downloadUrl, OUT);
