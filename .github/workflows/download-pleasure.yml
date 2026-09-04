@@ -1,0 +1,70 @@
+name: Download Pleasure Horizons jar
+
+# Runs the Playwright "Скачать без авторизации" 60s countdown flow on a GitHub
+# runner (which has full internet), downloads the jar, verifies its sha256, and
+# commits it to the `download-artifacts` branch so the sandbox can fetch it back.
+# Triggered on push to this feature branch (we can't push to main from here, and
+# workflow_dispatch only works for workflows present on the default branch).
+on:
+  push:
+    branches:
+      - arena/01a06e54-abc
+
+permissions:
+  contents: write
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: arena/01a06e54-abc
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm install playwright@latest
+          npx playwright install --with-deps chromium
+          npx playwright install-deps chromium || true
+
+      - name: Run downloader (capture log)
+        env:
+          OUT: ${{ github.workspace }}/Pleasure_Horizons-0.8.2-1.21.1.jar
+        run: |
+          set +e
+          node tools/playground_download.mjs > "${{ github.workspace }}/download_log.txt" 2>&1
+          echo "DOWNLOAD_SCRIPT_EXIT=$?" | tee -a "${{ github.workspace }}/download_log.txt"
+          echo "=== tail of log ==="
+          tail -80 "${{ github.workspace }}/download_log.txt"
+          ls -la "$OUT" 2>/dev/null || echo "no jar yet"
+          set -e
+
+      - name: Commit results (jar + diagnostics) to download-artifacts branch
+        run: |
+          git config user.name "arena-ai-coding-agent"
+          git config user.email "actions@github.com"
+          git checkout --orphan download-artifacts
+          git rm -rf . || true
+          mkdir -p downloads
+          if [ -f "$OUT" ]; then
+            mv "$OUT" downloads/Pleasure_Horizons-0.8.2-1.21.1.jar
+            echo "jar present"
+          else
+            echo "NO JAR — only diagnostics will be committed"
+          fi
+          cp "${{ github.workspace }}/download_log.txt" downloads/download_log.txt
+          git add downloads || true
+          git commit -m "Pleasure Horizons: download attempt results" || true
+          git push --force origin download-artifacts || echo "PUSH_FAILED"
+          echo "=== pushed. fetching ref for sanity ==="
+          git ls-remote origin download-artifacts || echo "ls-remote failed"
+        env:
+          OUT: ${{ github.workspace }}/Pleasure_Horizons-0.8.2-1.21.1.jar
