@@ -3,13 +3,15 @@
 //
 // The direct file endpoint is:
 //   https://www.playground.ru/api/file.download?file_id=...&post_id=...&file_name=...
-// It returns JSON. On first call it arms a 60s wait (returns lock_hash / seconds);
-// after the countdown you call it again with &lock_hash=...&log=0 to get the
-// real (CDN) download URL.
+// Its JSON reply after the FIRST call is:
+//   {"download_link":null,"magnet_link":null,"torrent_data":null,
+//    "lock_hash":"<hash>","download_hash":null,"wait_time":60}
+// After waiting `wait_time` seconds, you re-call with &lock_hash=<hash>&log=0
+// and the response then contains a real `download_link` (the CDN URL).
 //
-// We drive the API from within the page (so we share the site session/cookies),
-// inspect the JSON, wait for the countdown, then download the returned URL and
-// verify its sha256.
+// We drive the API from inside the page (sharing the session cookies), parse the
+// JSON, wait for the countdown, get the download_link, download it, and verify
+// the sha256.
 
 import { chromium } from "playwright";
 import crypto from "crypto";
@@ -35,12 +37,9 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-function download(url, dest, cookies) {
+function download(url, dest) {
   return new Promise((resolve, reject) => {
     const mod = url.startsWith("https") ? https : http;
-    const cookieHeader = Array.isArray(cookies)
-      ? cookies.map((c) => `${c.name}=${c.value}`).join("; ")
-      : cookies || "";
     const req = mod.get(
       url,
       {
@@ -48,13 +47,12 @@ function download(url, dest, cookies) {
           "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           Referer: PAGE,
-          Cookie: cookieHeader,
         },
       },
       (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           res.resume();
-          return resolve(download(new URL(res.headers.location, url).toString(), dest, cookies));
+          return resolve(download(new URL(res.headers.location, url).toString(), dest));
         }
         if (res.statusCode !== 200) {
           res.resume();
@@ -82,12 +80,17 @@ async function callApi(page, params) {
   const out = await page.evaluate(async (u) => {
     const r = await fetch(u, { credentials: "include", headers: { "X-Requested-With": "XMLHttpRequest" } });
     const t = await r.text();
-    return { status: r.status, finalUrl: r.url, body: t.slice(0, 4000), contentType: r.headers.get("content-type") };
+    return { status: r.status, body: t };
   }, url);
   console.log("API call:", url);
-  console.log("  -> status", out.status, "| content-type", out.contentType);
-  console.log("  -> body:", out.body.slice(0, 800));
-  return out;
+  console.log("  -> status", out.status, "body:", out.body.slice(0, 300));
+  let json = null;
+  try {
+    json = JSON.parse(out.body);
+  } catch (e) {
+    console.log("  -> not JSON:", out.body.slice(0, 300));
+  }
+  return { status: out.status, json, raw: out.body };
 }
 
 async function main() {
@@ -108,56 +111,36 @@ async function main() {
   await page.waitForLoadState("networkidle", { timeout: 60000 }).catch(() => {});
   await sleep(2000);
 
-  // 1) First API call to arm the download.
+  // 1) Arm the download.
   const first = await callApi(page, {});
-  // Also try the exact same shape the page used the second time (log=0) in case
-  // that directly returns the link. We'll just parse whatever we get.
   let downloadUrl = null;
+  let lockHash = first.json && first.json.lock_hash;
 
-  function grabUrlFromBody(body) {
-    // JSON may contain a direct url / link / download field, or a dwh link.
-    const urlRe = /https?:\/\/[^\s"'<>\\]+\.jar[^\s"'<>\\]*/gi;
-    const urls = [];
-    let m;
-    while ((m = urlRe.exec(body))) urls.push(m[0]);
-    // Also pull any "url":"..." or "link":"..." or "download":"..." fields.
-    const fieldRe = /"(?:url|link|download|href)"\s*:\s*"(https?:\/\/[^"]+)"/gi;
-    let f;
-    while ((f = fieldRe.exec(body))) urls.push(f[1]);
-    return urls;
+  // Possibly a direct link was already returned.
+  if (first.json && first.json.download_link) {
+    downloadUrl = first.json.download_link;
   }
 
-  const firstUrls = grabUrlFromBody(first.body).concat(grabUrlFromBody(first.finalUrl));
-  console.log("URLs found in first call:", JSON.stringify(firstUrls));
-  if (firstUrls.length) {
-    downloadUrl = firstUrls[0];
-  }
-
-  // If no direct link yet, wait for the countdown and retry with lock_hash if one
-  // was returned.
   if (!downloadUrl) {
-    // Extract lock_hash from first response body if present.
-    let lockHash = null;
-    const lh = /(?:lock_hash[":=]+)["']?([A-Za-z0-9]+)["']?/i.exec(first.body);
-    if (lh) lockHash = lh[1];
-    const secondsReg = /(?:seconds|wait|delay|time)[":=]+\s*(\d+)/i.exec(first.body);
-    const waitMs = secondsReg ? Number(secondsReg[1]) * 1000 : 60000;
-    console.log("No direct URL in first call. lock_hash=" + lockHash + ", waiting ~" + waitMs + "ms");
+    const waitMs = (first.json && first.json.wait_time ? first.json.wait_time : 60) * 1000;
+    console.log("Waiting for countdown ~" + waitMs + "ms (lock_hash=" + lockHash + ")");
     await sleep(Math.min(waitMs, 90000));
 
-    // Retry: with lock_hash & log=0, and also without (maybe server counts down).
-    const attempts = [];
-    if (lockHash) attempts.push({ lock_hash: lockHash, log: "0" });
-    attempts.push({ log: "0" });
-    attempts.push({});
-    for (const p of attempts) {
+    // 2) Re-call with lock_hash & log=0 to get the download_link.
+    const retries = [
+      { lock_hash: lockHash, log: "0" },
+      { lock_hash: lockHash },
+      { log: "0" },
+      {},
+    ];
+    for (const p of retries) {
       const r = await callApi(page, p);
-      const urls = grabUrlFromBody(r.body).concat(grabUrlFromBody(r.finalUrl));
-      console.log("  retry", JSON.stringify(p), "-> urls:", JSON.stringify(urls));
-      if (urls.length) {
-        downloadUrl = urls[0];
+      if (r.json && r.json.download_link) {
+        downloadUrl = r.json.download_link;
+        console.log("  Got download_link at params", JSON.stringify(p));
         break;
       }
+      console.log("  -> params", JSON.stringify(p), "no download_link yet:", JSON.stringify(r.json));
     }
   }
 
@@ -171,7 +154,7 @@ async function main() {
   }
 
   console.log("Downloading from", downloadUrl);
-  await download(downloadUrl, OUT, []);
+  await download(downloadUrl, OUT);
   const buf = fs.readFileSync(OUT);
   const h = sha256(buf);
   console.log("Size (bytes):", buf.length, "~", (buf.length / 1024 / 1024).toFixed(2), "MB");
