@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A local-first palette colorizer for adult-only anime illustrations." />
+  <title>SPECTRA — Anime Palette Colorizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+  <div class="age-gate" id="ageGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <div class="gate-card">
+      <div class="gate-mark">S</div>
+      <p class="eyebrow">ADULT ARTWORK WORKSPACE</p>
+      <h1 id="gateTitle">A respectful space for adult illustration.</h1>
+      <p class="gate-copy">SPECTRA is a browser-based color tool. By continuing, you confirm that you are 18+ and will only process fictional, adult-coded artwork you have the right to use.</p>
+      <ul class="gate-rules">
+        <li><span>01</span>No real people or likenesses</li>
+        <li><span>02</span>No minors or minor-coded characters</li>
+        <li><span>03</span>No uploads leave this browser</li>
+      </ul>
+      <div class="gate-actions">
+        <button class="button button-primary" id="acceptGate">I’m 18+ · Continue <span>→</span></button>
+        <button class="button button-quiet" id="exitGate">Exit</button>
+      </div>
+      <p class="tiny">Local-only color controls, not a content-hosting service.</p>
+    </div>
+  </div>
+
+  <main class="shell" id="app" aria-hidden="true">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Spectra home">
+        <span class="brand-symbol">S</span>
+        <span>SPECTRA</span>
+      </a>
+      <div class="topbar-center"><span class="status-dot"></span> LOCAL COLOR ENGINE</div>
+      <a class="help-link" href="#guide">How it works <span>↗</span></a>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> PALETTE COLORIZER / 01</p>
+        <h1>Give your line art<br /><em>its own atmosphere.</em></h1>
+        <p class="intro">Build a vivid color pass from your own palette, then fine tune every shade. Designed for grown-up anime illustrations and completely local to your browser.</p>
+        <div class="hero-actions">
+          <button class="button button-primary" id="uploadButton">Upload artwork <span>↑</span></button>
+          <button class="button button-outline" id="demoButton">Use studio demo <span>→</span></button>
+        </div>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-line"><span>BUILT FOR</span><strong>Illustrators<br />& color studies</strong></div>
+        <div class="meta-line"><span>STORAGE</span><strong>0 files<br />uploaded</strong></div>
+        <div class="hero-orbit" aria-hidden="true"><i></i><b>HUE<br />FLOW</b></div>
+      </div>
+    </section>
+
+    <section class="workbench" aria-labelledby="workspaceTitle">
+      <div class="workbench-bar">
+        <div><p class="eyebrow">CANVAS / 01</p><h2 id="workspaceTitle">Color studio</h2></div>
+        <div class="secure-chip"><span>✦</span> PROCESSING ON THIS DEVICE</div>
+      </div>
+
+      <div class="studio-grid">
+        <section class="canvas-panel" aria-label="Color preview">
+          <div class="canvas-toolbar">
+            <div class="view-switcher" role="group" aria-label="Preview mode">
+              <button class="view-choice active" data-view="compare" type="button">Compare</button>
+              <button class="view-choice" data-view="color" type="button">Color only</button>
+              <button class="view-choice" data-view="original" type="button">Original</button>
+            </div>
+            <div class="canvas-file"><span class="file-icon">⌁</span> <span id="fileName">studio-demo.svg</span></div>
+          </div>
+
+          <div class="stage-wrap" id="dropZone">
+            <div class="stage" id="stage">
+              <img id="originalPreview" src="assets/demo-line-art.svg" alt="Original artwork preview" />
+              <canvas id="colorCanvas" aria-label="Processed color preview"></canvas>
+              <div class="stage-label original-label">ORIGINAL</div>
+              <div class="stage-label color-label">COLOR PASS</div>
+              <div class="stage-empty" id="emptyState" hidden>
+                <div class="empty-icon">✦</div>
+                <strong>Drop an illustration here</strong>
+                <span>PNG, JPG, WebP or SVG · up to 15 MB</span>
+                <button class="text-button" id="emptyUploadButton">Browse your files <span>→</span></button>
+              </div>
+            </div>
+            <div class="compare-control" id="compareControl">
+              <input id="compareRange" type="range" min="0" max="100" value="68" aria-label="Comparison slider" />
+              <span class="compare-handle" id="compareHandle" aria-hidden="true"><i>↔</i></span>
+            </div>
+          </div>
+
+          <div class="canvas-footer">
+            <p><span class="pulse"></span><strong id="processStatus">Ready</strong><span id="statusDetail">— Studio palette applied</span></p>
+            <div class="zoom-controls"><button type="button" id="zoomOut" aria-label="Zoom out">−</button><span id="zoomLabel">100%</span><button type="button" id="zoomIn" aria-label="Zoom in">+</button></div>
+          </div>
+        </section>
+
+        <aside class="controls" aria-label="Color settings">
+          <div class="controls-heading">
+            <div><p class="eyebrow">COLOR PASS</p><h2>Shape the mood</h2></div>
+            <button class="reset-button" id="resetButton" type="button">Reset <span>↺</span></button>
+          </div>
+
+          <div class="control-section preset-section">
+            <div class="section-label"><span>01 / STARTING POINT</span><span>4 PALETTES</span></div>
+            <div class="preset-grid" id="presetGrid">
+              <button class="preset-card active" data-preset="sakura" type="button"><span class="preset-swatch sakura"></span><strong>Sakura haze</strong><small>Soft rose / ink</small></button>
+              <button class="preset-card" data-preset="midnight" type="button"><span class="preset-swatch midnight"></span><strong>Midnight ink</strong><small>Blue / violet</small></button>
+              <button class="preset-card" data-preset="sunset" type="button"><span class="preset-swatch sunset"></span><strong>Apricot dusk</strong><small>Gold / coral</small></button>
+              <button class="preset-card" data-preset="neon" type="button"><span class="preset-swatch neon"></span><strong>Neon pulse</strong><small>Mint / magenta</small></button>
+            </div>
+          </div>
+
+          <div class="control-section palette-section">
+            <div class="section-label"><span>02 / YOUR PALETTE</span><button class="randomize" id="randomizeButton" type="button">Shuffle <span>⟳</span></button></div>
+            <div class="tone-row">
+              <label class="tone-control"><input type="color" id="shadowColor" value="#322B57" /><span class="color-well shadow-well"></span><span><b>Shadows</b><em id="shadowHex">#322B57</em></span></label>
+              <label class="tone-control"><input type="color" id="midColor" value="#D56E91" /><span class="color-well mid-well"></span><span><b>Midtones</b><em id="midHex">#D56E91</em></span></label>
+              <label class="tone-control"><input type="color" id="highlightColor" value="#F9DEB5" /><span class="color-well highlight-well"></span><span><b>Highlights</b><em id="highlightHex">#F9DEB5</em></span></label>
+            </div>
+          </div>
+
+          <div class="control-section adjust-section">
+            <div class="section-label"><span>03 / FINE TUNE</span><button class="collapse-button" type="button" id="adjustCollapse" aria-expanded="true">−</button></div>
+            <div class="sliders" id="sliders">
+              <label class="range-row"><span><b>Color coverage</b><em id="coverageValue">78%</em></span><input type="range" id="coverage" min="0" max="100" value="78" /></label>
+              <label class="range-row"><span><b>Vibrance</b><em id="vibranceValue">18</em></span><input type="range" id="vibrance" min="-50" max="50" value="18" /></label>
+              <label class="range-row"><span><b>Contrast</b><em id="contrastValue">12</em></span><input type="range" id="contrast" min="-50" max="50" value="12" /></label>
+              <label class="range-row"><span><b>Warmth</b><em id="warmthValue">6</em></span><input type="range" id="warmth" min="-50" max="50" value="6" /></label>
+            </div>
+          </div>
+
+          <div class="controls-bottom">
+            <label class="ethics-check"><input id="rightsCheck" type="checkbox" /><span></span><small>I confirm this is adult fictional artwork I’m allowed to edit.</small></label>
+            <button class="button button-primary render-button" id="renderButton" type="button" disabled>Apply color pass <span>✦</span></button>
+            <button class="export-button" id="downloadButton" type="button" disabled>Download PNG <span>↓</span></button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="guide" id="guide">
+      <div class="guide-header"><p class="eyebrow"><span class="eyebrow-line"></span> A SMALLER, KINDER WORKFLOW</p><h2>From line to light<br />in three moves.</h2></div>
+      <div class="guide-cards">
+        <article><span>01</span><h3>Bring your own line art</h3><p>Drag in a grayscale sketch or illustration. It stays on your device.</p></article>
+        <article><span>02</span><h3>Choose a color story</h3><p>Start with a mood, then take control of shadows, midtones, and highlights.</p></article>
+        <article><span>03</span><h3>Keep refining</h3><p>Use the comparison slider and export a full-resolution color study when it feels right.</p></article>
+      </div>
+    </section>
+
+    <footer><span>© 2026 SPECTRA STUDIO</span><span>LOCAL-FIRST · ADULT FICTIONAL ART ONLY</span><span>MADE FOR COLOR STUDIES</span></footer>
+  </main>
+
+  <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden />
+  <script src="app.js"></script>
+</body>
+</html>

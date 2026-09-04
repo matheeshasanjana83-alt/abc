@@ -1,0 +1,57 @@
+<svg width="1080" height="1350" viewBox="0 0 1080 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="paper" x1="72" y1="45" x2="1013" y2="1305" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBFAF7"/><stop offset="1" stop-color="#EDE9E0"/>
+    </linearGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="#CFCCD1"/></pattern>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#paper)"/>
+  <rect x="47" y="47" width="986" height="1256" rx="42" stroke="#B7B1BD" stroke-width="3"/>
+  <path d="M830 158C918 198 969 284 963 389C955 523 871 635 785 695" stroke="#BAB5C1" stroke-width="5" stroke-linecap="round"/>
+  <path d="M843 190C902 229 929 301 925 373C920 457 882 517 824 577" stroke="#D7D1DA" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="850" cy="217" r="34" stroke="#292331" stroke-width="5"/>
+  <path d="M811 256C781 289 755 332 738 377" stroke="#292331" stroke-width="6" stroke-linecap="round"/>
+  <path d="M165 300C200 181 329 125 456 155C553 178 629 253 655 354" fill="url(#dots)" opacity=".75"/>
+  <path d="M176 854C116 799 101 693 153 613C187 561 244 526 307 518" stroke="#C4BEC9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M154 965C105 1005 93 1077 125 1138C155 1195 214 1230 277 1229" stroke="#C4BEC9" stroke-width="4" stroke-linecap="round"/>
+  <!-- hair mass -->
+  <path d="M277 415C254 273 324 161 470 145C625 127 773 231 772 410C771 549 679 675 574 738L300 680C258 600 251 505 277 415Z" fill="#E1DEE2" stroke="#292331" stroke-width="9" stroke-linejoin="round"/>
+  <!-- neck / jacket -->
+  <path d="M409 690L414 811L337 848L294 1203H805L761 847L659 805L658 665" fill="#F5F2EE" stroke="#292331" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M414 811L529 940L659 805" stroke="#292331" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M338 848L487 1034L529 940L570 1032L761 847" fill="#DEDBE2" stroke="#292331" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M293 1203L343 846L462 993L528 937L598 993L761 847L806 1203" fill="#E6E2E4" stroke="#292331" stroke-width="9" stroke-linejoin="round"/>
+  <!-- face -->
+  <path d="M334 346C352 284 428 244 522 246C623 248 695 300 705 376V495C704 586 644 674 527 705C411 676 337 586 334 490V346Z" fill="#F9F7F2" stroke="#292331" stroke-width="9" stroke-linejoin="round"/>
+  <!-- fringe -->
+  <path d="M281 414C274 291 340 191 466 177C598 163 735 246 757 367C694 342 644 320 595 284C569 352 531 400 474 431L449 319C418 390 369 432 295 459L281 414Z" fill="#CECAD3" stroke="#292331" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M596 284C615 371 648 436 706 493" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <path d="M449 319C454 404 426 476 373 535" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <!-- ear and earring -->
+  <path d="M693 419C750 400 756 489 706 508" fill="#F9F7F2" stroke="#292331" stroke-width="8" stroke-linecap="round"/>
+  <path d="M716 510C711 548 728 570 750 584" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="755" cy="593" r="15" fill="#B9B4C4" stroke="#292331" stroke-width="6"/>
+  <!-- eyes -->
+  <path d="M389 482C420 454 462 454 490 485C457 510 420 509 389 482Z" fill="#D0CDD6" stroke="#292331" stroke-width="7" stroke-linejoin="round"/>
+  <ellipse cx="441" cy="483" rx="11" ry="19" fill="#292331"/>
+  <path d="M566 485C598 453 641 456 669 483C638 510 599 511 566 485Z" fill="#D0CDD6" stroke="#292331" stroke-width="7" stroke-linejoin="round"/>
+  <ellipse cx="616" cy="484" rx="11" ry="19" fill="#292331"/>
+  <path d="M385 449L489 438" stroke="#292331" stroke-width="8" stroke-linecap="round"/>
+  <path d="M569 438L672 450" stroke="#292331" stroke-width="8" stroke-linecap="round"/>
+  <!-- nose / mouth -->
+  <path d="M531 498L511 561L540 568" stroke="#292331" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M470 610C505 632 550 633 585 608" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <path d="M437 578C458 589 473 593 485 594" stroke="#C4BEC9" stroke-width="6" stroke-linecap="round"/>
+  <path d="M588 594C606 592 622 587 638 577" stroke="#C4BEC9" stroke-width="6" stroke-linecap="round"/>
+  <!-- shirt details -->
+  <path d="M503 1031L480 1170" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <path d="M556 1030L579 1170" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <path d="M370 1123C424 1091 458 1104 483 1130" stroke="#B5AFBD" stroke-width="6" stroke-linecap="round"/>
+  <path d="M592 1130C621 1104 659 1091 721 1123" stroke="#B5AFBD" stroke-width="6" stroke-linecap="round"/>
+  <!-- graphic details -->
+  <path d="M181 296L199 232L240 214" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <path d="M178 307L245 310" stroke="#292331" stroke-width="7" stroke-linecap="round"/>
+  <path d="M850 777L886 735L922 778L890 813L850 777Z" fill="#E0DCE4" stroke="#292331" stroke-width="6"/>
+  <path d="M160 881H255" stroke="#292331" stroke-width="6" stroke-linecap="round"/>
+  <text x="151" y="934" fill="#292331" font-family="Arial, sans-serif" font-size="20" letter-spacing="5">MONO STUDY 01</text>
+</svg>
