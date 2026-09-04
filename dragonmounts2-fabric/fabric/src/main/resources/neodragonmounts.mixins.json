@@ -1,0 +1,37 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.dragonmounts.neo.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AxeItemMixin",
+    "BredAnimalsTriggerMixin",
+    "DebugPacketsMixin",
+    "DragonEggBlockMixin",
+    "EnchantmentHelperMixin",
+    "ItemEntityMixin",
+    "ItemStackMixin",
+    "LivingEntityMixin",
+    "MobAccessor",
+    "NoiseColumnMixin",
+    "PlayerEntityMixin",
+    "ScoreboardMixin",
+    "ShearableEntityMixin",
+    "TrialSpawnerMixin",
+    "TripWireBlockMixin",
+    "WolfMixin"
+  ],
+  "client": [
+    "AbstractClientPlayerMixin",
+    "CameraMixin",
+    "ClientPacketListenerMixin",
+    "CoreShadersMixin",
+    "CustomHeadLayerMixin",
+    "DebugRendererMixin",
+    "GuiGraphicsMixin",
+    "LocalPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,66 @@
+package net.dragonmounts.neo.common.client.renderer.dragon;
+
+import net.dragonmounts.neo.common.client.model.dragon.LegPart;
+import net.dragonmounts.neo.common.client.renderer.block.DragonHeadRenderState;
+import net.dragonmounts.neo.common.client.variant.VariantAppearance;
+import net.dragonmounts.neo.common.util.ArrayUtil;
+import net.dragonmounts.neo.common.util.Segment;
+import net.dragonmounts.neo.compat.registry.DragonVariant;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
+import org.joml.Vector3f;
+
+import static net.dragonmounts.neo.common.entity.dragon.DragonModelContracts.*;
+
+/**
+ * Per-dragon client animation snapshot used by {@link DragonAnimator} and {@link DragonModel}.
+ * This is deliberately not backed by the 1.21.2+ entity render-state classes so the mod can
+ * compile and run on Minecraft 1.21.1, which still renders entities directly.
+ */
+public class DragonRenderState implements DragonHeadRenderState {
+    // LivingRenderState-like fields
+    public @UnknownNullability DragonVariant variant;
+    public ItemStack armor = ItemStack.EMPTY;
+    public @Nullable Vec3 crystal;
+    public boolean renderCrystalBeams;
+    public boolean isSaddled;
+    public boolean hasChest;
+    public int hurtTime;
+    public float pitch;
+    public float offsetY;
+    public int maxDeathTime;
+    public float xRot;
+    public float yRot;
+    public float walkAnimationPos;
+    public float walkAnimationSpeed;
+    public float scale;
+    public float ageScale;
+    public float ageInTicks;
+    public Pose pose = Pose.STANDING;
+    public boolean isInvisible;
+    public int deathTime;
+    //--------head--------
+    public @UnknownNullability Segment head;
+    public float jawRotX;
+    //--------neck--------
+    public final Segment[] neckSegments = ArrayUtil.fillArray(new Segment[NECK_SEGMENTS], Segment::new);
+    //--------wing--------
+    public final Vector3f wingRot = new Vector3f();
+    public final Vector3f armRot = new Vector3f();
+    public final float[] fingerRotY = new float[WING_FINGERS];
+    //--------legs--------
+    public final LegPart.Pose leftFrontLeg = new LegPart.Pose();
+    public final LegPart.Pose rightFrontLeg = new LegPart.Pose();
+    public final LegPart.Pose leftHindLeg = new LegPart.Pose();
+    public final LegPart.Pose rightHindLeg = new LegPart.Pose();
+    //--------tail--------
+    public final Segment[] tailSegments = ArrayUtil.fillArray(new Segment[TAIL_SEGMENTS], Segment::new);
+
+    @Override
+    public @Nullable VariantAppearance neodragonmounts$getAppearance() {
+        return this.variant.appearance;
+    }
+}
