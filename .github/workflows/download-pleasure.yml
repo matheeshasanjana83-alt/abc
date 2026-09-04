@@ -35,34 +35,36 @@ jobs:
           npx playwright install --with-deps chromium
           npx playwright install-deps chromium || true
 
-      - name: Run downloader
+      - name: Run downloader (capture log)
         env:
           OUT: ${{ github.workspace }}/Pleasure_Horizons-0.8.2-1.21.1.jar
         run: |
-          node tools/playground_download.mjs || echo "DOWNLOAD_SCRIPT_EXIT=$?"
+          set +e
+          node tools/playground_download.mjs > "${{ github.workspace }}/download_log.txt" 2>&1
+          echo "DOWNLOAD_SCRIPT_EXIT=$?" | tee -a "${{ github.workspace }}/download_log.txt"
+          echo "=== tail of log ==="
+          tail -80 "${{ github.workspace }}/download_log.txt"
           ls -la "$OUT" 2>/dev/null || echo "no jar yet"
+          set -e
 
-      - name: Verify file exists
-        id: verify
-        run: |
-          if [ -f "$OUT" ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            sha256sum "$OUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Commit jar to download-artifacts branch
-        if: steps.verify.outputs.exists == 'true'
+      - name: Commit results (jar + diagnostics) to download-artifacts branch
         run: |
           git config user.name "arena-ai-coding-agent"
           git config user.email "actions@github.com"
           git checkout --orphan download-artifacts
           git rm -rf . || true
           mkdir -p downloads
-          mv "$OUT" downloads/Pleasure_Horizons-0.8.2-1.21.1.jar
-          git add downloads/Pleasure_Horizons-0.8.2-1.21.1.jar
-          git commit -m "Add Pleasure Horizons 0.8.2 jar (CI download)" || true
+          if [ -f "$OUT" ]; then
+            mv "$OUT" downloads/Pleasure_Horizons-0.8.2-1.21.1.jar
+            echo "jar present"
+          else
+            echo "NO JAR — only diagnostics will be committed"
+          fi
+          cp "${{ github.workspace }}/download_log.txt" downloads/download_log.txt
+          git add downloads || true
+          git commit -m "Pleasure Horizons: download attempt results" || true
           git push --force origin download-artifacts || echo "PUSH_FAILED"
+          echo "=== pushed. fetching ref for sanity ==="
+          git ls-remote origin download-artifacts || echo "ls-remote failed"
         env:
           OUT: ${{ github.workspace }}/Pleasure_Horizons-0.8.2-1.21.1.jar
