@@ -101,7 +101,34 @@ Launch the Fabric 1.20.1 profile. Kilt should remap and load the Forge mods.
 
 ---
 
-## 5. Important honesty note
+## 5. If you see `no good? no, this man is definitely up to evil`
+
+That line is a Kilt safety/refusal message. In most 1.20.1 setups it means Kilt noticed a mod it does
+not want to load or a mod it cannot transform safely. Common causes and fixes:
+
+1. **Remove cheat/dupe/exploit mods.**
+   A Forge jar like `duper-1.0.0-forge-1.20.1.jar` is exactly the kind of thing that triggers this.
+   Delete it and any other `*duper*`, `*dupe*`, or suspicious utility mods from `mods/`.
+
+2. **Test with the absolute minimum mod list.**
+   Do not test Kilt with 200+ mods. Use `mods-minimal.txt` in this folder as the checklist. Once
+   Aliens Untapped loads, add your other mods back in small groups.
+
+3. **Remove agent / ASM-Fabric-Loader-based mods.**
+   Libraries such as `net_lostluma_battery` (Battery), `Dynamic FPS`, and anything built on
+   ASM Fabric Loader can conflict with Kilt's remapping/agent setup. Remove them while testing.
+
+4. **Never mix Forge and Fabric builds for Kilt content.**
+   Use the **Forge 1.20.1** version of AlienEvo, Palladium, GeckoLib, KubeJS, Rhino, Architectury,
+   Pehkui, and Cardinal-Lib. The addon has to see Forge versions.
+
+5. **Check the exact Kilt version.**
+   Use `Kilt v20.1.20 (MC 1.20.1)` and Fabric Loader 0.18.0 or newer.
+   `ForgeConfigAPIPort` must be the Fabric 1.20.1 build.
+
+---
+
+## 6. Important honesty note
 
 This is **not** a native Fabric port of Aliens Untapped. The addon is All Rights Reserved and no
 public source is available, so a true port is not something that can be made from just the jar.
