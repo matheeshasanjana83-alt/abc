@@ -1,49 +1,64 @@
 // Playwright-based downloader for the playground.ru "Скачать без авторизации"
 // 60s-countdown flow. Runs on a GitHub Actions runner (which has full internet).
 //
-// It:
-//   1. opens the file page,
-//   2. clicks the FIRST "Скачать без авторизации" button (the 0.8.2 entry),
-//   3. waits for the countdown to finish,
-//   4. detects + downloads the resulting direct link,
-//   5. verifies the sha256, writes the jar to OUT.
+// The direct file endpoint is:
+//   https://www.playground.ru/api/file.download?file_id=...&post_id=...&file_name=...
+// It returns JSON. On first call it arms a 60s wait (returns lock_hash / seconds);
+// after the countdown you call it again with &lock_hash=...&log=0 to get the
+// real (CDN) download URL.
 //
-// It prints lots of diagnostics so that, on failure, the Action logs tell us
-// exactly what to adjust next iteration.
+// We drive the API from within the page (so we share the site session/cookies),
+// inspect the JSON, wait for the countdown, then download the returned URL and
+// verify its sha256.
 
 import { chromium } from "playwright";
 import crypto from "crypto";
 import fs from "fs";
-import path from "path";
 import https from "https";
 import http from "http";
 import { URL } from "url";
 
 const PAGE =
   "https://www.playground.ru/minecraft/file/minecraft_seks_mod_pleasure_horizons_fabric_1_21_1-sandymandy_notnightsky-1850336";
+const FILE_ID = "433596";
+const POST_ID = "1850336";
+const FILE_NAME = "Pleasure_Horizons-0.8.2-1.21.1.jar";
 const EXPECTED_SHA =
   "f4e5c4908ea0bac45a5042cc5dbd61980efe98b34346e7034efdd0ffacaa6220";
-const EXPECTED_SIZE = 25.44 * 1024 * 1024; // approx
 const OUT = process.env.OUT || "/tmp/Pleasure_Horizons-0.8.2-1.21.1.jar";
 
 function sha256(buf) {
   return crypto.createHash("sha256").update(buf).digest("hex");
 }
 
-function fileDownload(url, dest) {
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function download(url, dest, cookies) {
   return new Promise((resolve, reject) => {
     const mod = url.startsWith("https") ? https : http;
+    const cookieHeader = Array.isArray(cookies)
+      ? cookies.map((c) => `${c.name}=${c.value}`).join("; ")
+      : cookies || "";
     const req = mod.get(
       url,
-      { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", Referer: PAGE } },
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          Referer: PAGE,
+          Cookie: cookieHeader,
+        },
+      },
       (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           res.resume();
-          return resolve(fileDownload(new URL(res.headers.location, url).toString(), dest));
+          return resolve(download(new URL(res.headers.location, url).toString(), dest, cookies));
         }
         if (res.statusCode !== 200) {
           res.resume();
-          return reject(new Error("HTTP " + res.statusCode));
+          return reject(new Error("HTTP " + res.statusCode + " for " + url));
         }
         const f = fs.createWriteStream(dest);
         res.pipe(f);
@@ -52,22 +67,33 @@ function fileDownload(url, dest) {
       }
     );
     req.on("error", reject);
-    req.setTimeout(120000, () => req.destroy(new Error("timeout")));
+    req.setTimeout(180000, () => req.destroy(new Error("timeout")));
   });
 }
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+async function callApi(page, params) {
+  const qs = new URLSearchParams({
+    file_id: FILE_ID,
+    post_id: POST_ID,
+    file_name: FILE_NAME,
+    ...params,
+  });
+  const url = `https://www.playground.ru/api/file.download?${qs.toString()}`;
+  const out = await page.evaluate(async (u) => {
+    const r = await fetch(u, { credentials: "include", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    const t = await r.text();
+    return { status: r.status, finalUrl: r.url, body: t.slice(0, 4000), contentType: r.headers.get("content-type") };
+  }, url);
+  console.log("API call:", url);
+  console.log("  -> status", out.status, "| content-type", out.contentType);
+  console.log("  -> body:", out.body.slice(0, 800));
+  return out;
 }
 
 async function main() {
   const browser = await chromium.launch({
     headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-blink-features=AutomationControlled",
-      "--disable-dev-shm-usage",
-    ],
+    args: ["--no-sandbox", "--disable-blink-features=AutomationControlled", "--disable-dev-shm-usage"],
   });
   const context = await browser.newContext({
     userAgent:
@@ -76,116 +102,79 @@ async function main() {
     locale: "ru-RU",
     acceptDownloads: true,
   });
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, "webdriver", { get: () => undefined });
-    window.chrome = window.chrome || { runtime: {} };
-    Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3] });
-    Object.defineProperty(navigator, "languages", { get: () => ["ru-RU", "ru", "en"] });
-  });
   const page = await context.newPage();
-
-  page.on("download", async (d) => {
-    console.log("[download event] ", d.suggestedFilename(), d.url());
-    try {
-      await d.saveAs(OUT);
-      console.log("[download event] saved to", OUT);
-    } catch (e) {
-      console.log("[download event] save failed", e.message);
-    }
-  });
-  page.on("response", (r) => {
-    if (/\.jar($|\?)/.test(r.url()) || /dl\.|download|playground\.ru\/file\/dl/.test(r.url())) {
-      console.log("[response] ", r.status(), r.url());
-    }
-  });
-  page.on("console", (m) => {
-    if (m.type() === "error") console.log("[console.error]", m.text());
-  });
-
   console.log("Opening page:", PAGE);
   await page.goto(PAGE, { waitUntil: "domcontentloaded", timeout: 120000 });
   await page.waitForLoadState("networkidle", { timeout: 60000 }).catch(() => {});
   await sleep(2000);
 
-  console.log("Title:", await page.title());
+  // 1) First API call to arm the download.
+  const first = await callApi(page, {});
+  // Also try the exact same shape the page used the second time (log=0) in case
+  // that directly returns the link. We'll just parse whatever we get.
+  let downloadUrl = null;
 
-  // Collect all link/button texts for diagnostics.
-  const allLinks = await page.$$eval("a", (as) =>
-    as.map((a) => ({ text: (a.textContent || "").trim().slice(0, 40), href: a.href })).filter((x) => x.text)
-  );
-  console.log("---- ALL LINKS (text -> href) ----");
-  for (const l of allLinks) {
-    const label = l.text.replace(/\s+/g, " ");
-    if (/скачать|download|авторизац|файл/i.test(label) || /\.jar|download|dl\./i.test(l.href)) {
-      console.log(`  ${JSON.stringify(label)}  ->  ${l.href}`);
-    }
-  }
-  console.log("---- LINKS END ----");
-
-  // Find the FIRST "Скачать без авторизации" button/link.
-  const noAuthSelector = `text=/Скачать без авторизации/i`;
-  let clicked = false;
-  try {
-    const el = page.locator(noAuthSelector).first();
-    await el.waitFor({ state: "visible", timeout: 30000 });
-    console.log("Found 'Скачать без авторизации', clicking...");
-    // If it is an <a>, extract href first.
-    const href = await el.getAttribute("href").catch(() => null);
-    console.log("  href of the button:", href);
-    await el.click();
-    clicked = true;
-  } catch (e) {
-    console.log("Could not click 'Скачать без авторизации':", e.message);
-  }
-  if (!clicked) {
-    // fallback: try generic download
-    await page.close();
-    await browser.close();
-    console.log("NO_BUTTON");
-    process.exit(3);
+  function grabUrlFromBody(body) {
+    // JSON may contain a direct url / link / download field, or a dwh link.
+    const urlRe = /https?:\/\/[^\s"'<>\\]+\.jar[^\s"'<>\\]*/gi;
+    const urls = [];
+    let m;
+    while ((m = urlRe.exec(body))) urls.push(m[0]);
+    // Also pull any "url":"..." or "link":"..." or "download":"..." fields.
+    const fieldRe = /"(?:url|link|download|href)"\s*:\s*"(https?:\/\/[^"]+)"/gi;
+    let f;
+    while ((f = fieldRe.exec(body))) urls.push(f[1]);
+    return urls;
   }
 
-  // Wait for the countdown to elapse. The page typically shows a timer.
-  // We poll for up to 90s, looking for either a direct download link appearing
-  // or a download event firing.
-  const t0 = Date.now();
-  let directUrl = null;
-  while (Date.now() - t0 < 90000) {
-    // Any visible anchor whose href looks like a file (jar / download / dl.)?
-    const candidates = await page.$$eval("a", (as) =>
-      as.map((a) => ({ text: (a.textContent || "").trim().slice(0, 30), href: a.href }))
-        .filter((x) => x.href && /\.jar|download|dl\.|files\.|file\?|idd=/i.test(x.href))
-    );
-    console.log("  [t=" + Math.round((Date.now() - t0) / 1000) + "s] candidates:", JSON.stringify(candidates.slice(0, 6)));
-    if (candidates.length) {
-      directUrl = candidates[0].href;
-      break;
+  const firstUrls = grabUrlFromBody(first.body).concat(grabUrlFromBody(first.finalUrl));
+  console.log("URLs found in first call:", JSON.stringify(firstUrls));
+  if (firstUrls.length) {
+    downloadUrl = firstUrls[0];
+  }
+
+  // If no direct link yet, wait for the countdown and retry with lock_hash if one
+  // was returned.
+  if (!downloadUrl) {
+    // Extract lock_hash from first response body if present.
+    let lockHash = null;
+    const lh = /(?:lock_hash[":=]+)["']?([A-Za-z0-9]+)["']?/i.exec(first.body);
+    if (lh) lockHash = lh[1];
+    const secondsReg = /(?:seconds|wait|delay|time)[":=]+\s*(\d+)/i.exec(first.body);
+    const waitMs = secondsReg ? Number(secondsReg[1]) * 1000 : 60000;
+    console.log("No direct URL in first call. lock_hash=" + lockHash + ", waiting ~" + waitMs + "ms");
+    await sleep(Math.min(waitMs, 90000));
+
+    // Retry: with lock_hash & log=0, and also without (maybe server counts down).
+    const attempts = [];
+    if (lockHash) attempts.push({ lock_hash: lockHash, log: "0" });
+    attempts.push({ log: "0" });
+    attempts.push({});
+    for (const p of attempts) {
+      const r = await callApi(page, p);
+      const urls = grabUrlFromBody(r.body).concat(grabUrlFromBody(r.finalUrl));
+      console.log("  retry", JSON.stringify(p), "-> urls:", JSON.stringify(urls));
+      if (urls.length) {
+        downloadUrl = urls[0];
+        break;
+      }
     }
-    const out = await page.evaluate(() => document.body.innerText);
-    if (/скачивание|загрузка|сохранить|download|готово|скачать файл/i.test(out)) {
-      // keep waiting
-    }
-    await sleep(3000);
   }
 
   await page.close();
   await browser.close();
 
-  console.log("Chosen direct URL:", directUrl);
-  if (!directUrl) {
+  console.log("Final download URL:", downloadUrl);
+  if (!downloadUrl) {
     console.log("NO_DIRECT_URL");
     process.exit(4);
   }
 
-  // Download it.
-  console.log("Downloading from", directUrl);
-  await fileDownload(directUrl, OUT);
-
+  console.log("Downloading from", downloadUrl);
+  await download(downloadUrl, OUT, []);
   const buf = fs.readFileSync(OUT);
   const h = sha256(buf);
-  const size = buf.length;
-  console.log("Downloaded: ", OUT);
-  console.log("Size (bytes):", size, "~", (size / 1024 / 1024).toFixed(2), "MB");
+  console.log("Size (bytes):", buf.length, "~", (buf.length / 1024 / 1024).toFixed(2), "MB");
   console.log("sha256:", h);
   if (h.toLowerCase() !== EXPECTED_SHA.toLowerCase()) {
     console.log("SHA256 MISMATCH, expected", EXPECTED_SHA);
