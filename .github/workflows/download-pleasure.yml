@@ -3,8 +3,12 @@ name: Download Pleasure Horizons jar
 # Runs the Playwright "Скачать без авторизации" 60s countdown flow on a GitHub
 # runner (which has full internet), downloads the jar, verifies its sha256, and
 # commits it to the `download-artifacts` branch so the sandbox can fetch it back.
+# Triggered on push to this feature branch (we can't push to main from here, and
+# workflow_dispatch only works for workflows present on the default branch).
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - arena/01a06e54-abc
 
 permissions:
   contents: write
