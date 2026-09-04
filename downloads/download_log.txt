@@ -1,0 +1,14 @@
+Opening page: https://www.playground.ru/minecraft/file/minecraft_seks_mod_pleasure_horizons_fabric_1_21_1-sandymandy_notnightsky-1850336
+API call: https://www.playground.ru/api/file.download?file_id=433596&post_id=1850336&file_name=Pleasure_Horizons-0.8.2-1.21.1.jar
+  -> status 200 body: {"download_link":null,"magnet_link":null,"torrent_data":null,"lock_hash":"hmvy5tl0v7g4yzzyme3ew4uxfk0scprk","download_hash":null,"wait_time":60}
+Waiting for countdown ~60000ms (lock_hash=hmvy5tl0v7g4yzzyme3ew4uxfk0scprk)
+API call: https://www.playground.ru/api/file.download?file_id=433596&post_id=1850336&file_name=Pleasure_Horizons-0.8.2-1.21.1.jar&lock_hash=hmvy5tl0v7g4yzzyme3ew4uxfk0scprk&log=0
+  -> status 200 body: {"download_link":"\/\/dl1.gamedl.ru\/download\/SF0mqBAAAAQE9eTnFbS5yKDo-EH6GxrnWwUKjFgO\/H1\/f4e5c4908ea0bac45a5042cc5dbd61980efe98b34346e7034efdd0ffacaa6220\/1850336\/Pleasure_Horizons-0.8.2-1.21.1.jar","magnet_link":"magnet:?xt=urn:btih:5CFDF071117CD3415DB52DB460B8724A25FDCCAF\u0026dn=Pleasure_Hor
+  Got download_link at params {"lock_hash":"hmvy5tl0v7g4yzzyme3ew4uxfk0scprk","log":"0"}
+Final download URL: //dl1.gamedl.ru/download/SF0mqBAAAAQE9eTnFbS5yKDo-EH6GxrnWwUKjFgO/H1/f4e5c4908ea0bac45a5042cc5dbd61980efe98b34346e7034efdd0ffacaa6220/1850336/Pleasure_Horizons-0.8.2-1.21.1.jar
+Normalized download URL: https://dl1.gamedl.ru/download/SF0mqBAAAAQE9eTnFbS5yKDo-EH6GxrnWwUKjFgO/H1/f4e5c4908ea0bac45a5042cc5dbd61980efe98b34346e7034efdd0ffacaa6220/1850336/Pleasure_Horizons-0.8.2-1.21.1.jar
+Downloading from https://dl1.gamedl.ru/download/SF0mqBAAAAQE9eTnFbS5yKDo-EH6GxrnWwUKjFgO/H1/f4e5c4908ea0bac45a5042cc5dbd61980efe98b34346e7034efdd0ffacaa6220/1850336/Pleasure_Horizons-0.8.2-1.21.1.jar
+Size (bytes): 26679734 ~ 25.44 MB
+sha256: f4e5c4908ea0bac45a5042cc5dbd61980efe98b34346e7034efdd0ffacaa6220
+SHA256 MATCH, file verified OK.
+DOWNLOAD_SCRIPT_EXIT=0
