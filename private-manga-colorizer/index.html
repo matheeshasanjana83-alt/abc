@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Private, browser-local manga palette colorizer." />
+  <title>Manga Tone — Private Colorizer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="age-modal" id="ageModal" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
+    <section class="age-card">
+      <div class="age-badge">18+</div>
+      <p class="kicker">PRIVATE LOCAL TOOL</p>
+      <h1 id="ageTitle">Your reading stays on your device.</h1>
+      <p>This local colorizer is for personal use with fictional, adult manga pages that you are allowed to process. No images are uploaded or stored by this app.</p>
+      <div class="rule-list">
+        <span>Adult fictional characters only</span>
+        <span>No real people or likenesses</span>
+        <span>No minors or minor-coded characters</span>
+      </div>
+      <div class="modal-actions">
+        <button id="enterApp" class="primary">I’m 18+ · Enter studio <b>→</b></button>
+        <button id="closeApp" class="secondary">Leave</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="closed-message" id="closedMessage" hidden>
+    <div><strong>MANGA TONE</strong><p>This private workspace is for adult fictional artwork only.</p></div>
+  </div>
+
+  <main id="app" aria-hidden="true">
+    <header class="topbar">
+      <a class="wordmark" href="#top" aria-label="Manga Tone private colorizer">
+        <span class="logo-mark">M</span>
+        <span>MANGA <i>TONE</i></span>
+      </a>
+      <p class="private-status"><span></span> PRIVATE SESSION · NOTHING LEAVES THIS BROWSER</p>
+      <button class="about-button" id="privacyButton" type="button">How private mode works <span>↗</span></button>
+    </header>
+
+    <section class="intro" id="top">
+      <div>
+        <p class="kicker">MANGA COLORIZER / LOCAL EDITION</p>
+        <h1>Read in <em>your</em><br />own color.</h1>
+        <p class="lede">Drop black-and-white manga pages, choose a color atmosphere, and export the result. This lightweight tool works entirely in your browser — no account, no cloud, no history.</p>
+      </div>
+      <div class="intro-note">
+        <span>MADE FOR</span><strong>Personal color<br />studies & reading</strong>
+        <span>PROCESSING</span><strong>On-device<br />palette mapping</strong>
+      </div>
+    </section>
+
+    <section class="workspace" aria-labelledby="workspaceTitle">
+      <div class="workspace-heading">
+        <div><p class="kicker">YOUR PRIVATE DESK</p><h2 id="workspaceTitle">Manga color studio</h2></div>
+        <div class="workspace-tools">
+          <button class="small-button" id="clearAll" type="button" disabled>Clear session</button>
+          <label class="upload-button" for="pageUpload">+ Add manga pages</label>
+          <input id="pageUpload" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" multiple hidden />
+        </div>
+      </div>
+
+      <div class="studio">
+        <aside class="page-rail" aria-label="Page queue">
+          <div class="rail-header"><span>PAGE QUEUE</span><b id="pageCount">0 PAGES</b></div>
+          <div class="drop-hint" id="dropHint">
+            <span class="plus">+</span>
+            <strong>Start a private set</strong>
+            <small>Drop page files here<br />or use Add manga pages</small>
+          </div>
+          <div class="page-list" id="pageList" aria-live="polite"></div>
+          <p class="rail-note">PNG · JPG · WebP · SVG<br />15 MB max each · up to 30 pages</p>
+        </aside>
+
+        <section class="preview-panel" aria-label="Color preview">
+          <div class="preview-bar">
+            <div class="view-toggle" role="group" aria-label="Preview view">
+              <button type="button" class="active" data-view="split">Compare</button>
+              <button type="button" data-view="color">Color</button>
+              <button type="button" data-view="original">B&W</button>
+            </div>
+            <p id="currentFileLabel">No page selected</p>
+            <div class="page-nav">
+              <button id="previousPage" type="button" aria-label="Previous page" disabled>←</button>
+              <span id="pagePosition">— / —</span>
+              <button id="nextPage" type="button" aria-label="Next page" disabled>→</button>
+            </div>
+          </div>
+
+          <div class="image-stage" id="imageStage">
+            <img id="originalImage" alt="Original black and white manga page" />
+            <canvas id="resultCanvas" aria-label="Colorized manga page"></canvas>
+            <div class="stage-tag tag-result">COLOR</div>
+            <div class="stage-tag tag-original">B&amp;W</div>
+            <div class="welcome-stage" id="welcomeStage">
+              <div class="welcome-symbol">✦</div>
+              <h3>Open a page to begin</h3>
+              <p>Your artwork is held only in the current browser memory.</p>
+              <button id="welcomeUpload" class="underlined" type="button">Choose manga pages <span>→</span></button>
+            </div>
+          </div>
+          <div class="compare-layer" id="compareLayer">
+            <input type="range" id="comparison" min="0" max="100" value="60" aria-label="Compare original and colorized page" />
+            <span id="comparisonHandle"><b>↔</b></span>
+          </div>
+          <div class="stage-footer"><span><i id="processingDot"></i><b id="processingText">Waiting for a page</b><em id="processingDetail">— local-only workspace</em></span><span id="imageSize">—</span></div>
+        </section>
+
+        <aside class="settings-panel" aria-label="Color settings">
+          <div class="settings-title"><div><p class="kicker">COLOR CONTROLS</p><h2>Set the scene.</h2></div><button id="resetSettings" type="button">Reset ↺</button></div>
+
+          <section class="settings-section">
+            <div class="section-title"><span>01 / QUICK MOODS</span><small>SELECT ONE</small></div>
+            <div class="moods" id="moods">
+              <button class="mood active" data-mood="rose" type="button"><i class="mood-rose"></i><span><b>Rose room</b><small>Plum · blush · cream</small></span></button>
+              <button class="mood" data-mood="night" type="button"><i class="mood-night"></i><span><b>Night train</b><small>Indigo · blue · moon</small></span></button>
+              <button class="mood" data-mood="gold" type="button"><i class="mood-gold"></i><span><b>Golden hour</b><small>Rust · amber · ivory</small></span></button>
+              <button class="mood" data-mood="aqua" type="button"><i class="mood-aqua"></i><span><b>Neo aqua</b><small>Teal · lilac · mint</small></span></button>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="section-title"><span>02 / CUSTOM PALETTE</span><button id="shufflePalette" type="button">Shuffle ⟳</button></div>
+            <div class="palette-controls">
+              <label><input id="darkColor" type="color" value="#332556" /><span id="darkSwatch"></span><b>Ink & shadows</b><em id="darkValue">#332556</em></label>
+              <label><input id="midColor" type="color" value="#D26F91" /><span id="midSwatch"></span><b>Midtones</b><em id="midValue">#D26F91</em></label>
+              <label><input id="lightColor" type="color" value="#FFE4BF" /><span id="lightSwatch"></span><b>Light & paper</b><em id="lightValue">#FFE4BF</em></label>
+            </div>
+          </section>
+
+          <section class="settings-section tune-section">
+            <div class="section-title"><span>03 / PAGE TUNING</span><button id="tuneToggle" type="button" aria-expanded="true">−</button></div>
+            <div id="tuningControls" class="tuning-controls">
+              <label class="slider-row"><span><b>Color coverage</b><em id="coverageReadout">76%</em></span><input id="coverage" type="range" min="0" max="100" value="76" /></label>
+              <label class="slider-row"><span><b>Protect dark ink</b><em id="inkReadout">84%</em></span><input id="ink" type="range" min="0" max="100" value="84" /></label>
+              <label class="slider-row"><span><b>Color intensity</b><em id="intensityReadout">22</em></span><input id="intensity" type="range" min="-40" max="50" value="22" /></label>
+              <label class="slider-row"><span><b>Paper warmth</b><em id="warmthReadout">8</em></span><input id="warmth" type="range" min="-40" max="40" value="8" /></label>
+            </div>
+          </section>
+
+          <div class="settings-bottom">
+            <label class="rights"><input id="rights" type="checkbox" /><span></span><small>I’m editing adult fictional artwork that I may use privately.</small></label>
+            <button id="applyButton" class="primary apply" type="button" disabled>Apply color to this page <b>✦</b></button>
+            <button id="downloadButton" class="download" type="button" disabled>Download current PNG <b>↓</b></button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="privacy-panel" id="privacyPanel" hidden>
+      <button id="closePrivacy" aria-label="Close privacy information">×</button>
+      <p class="kicker">PRIVATE MODE EXPLAINED</p>
+      <h2>Files are processed in your browser’s temporary memory.</h2>
+      <div><p>There is no upload API, database, analytics, sign-in, or remote image source in this project. Closing or refreshing this page clears your active set.</p><p>For extra privacy, download this folder and open it from your own computer or use it offline after saving the files locally.</p></div>
+    </section>
+
+    <footer><span>MANGA TONE · LOCAL EDITION</span><span>ADULT FICTIONAL ART ONLY</span><span>NO CLOUD · NO ACCOUNT · NO HISTORY</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
