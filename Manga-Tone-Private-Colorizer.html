@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Private, browser-local manga palette colorizer." />
+  <title>Manga Tone — Private Colorizer</title>
+  <style>
+:root { --ink:#201b28; --wash:#f5f1eb; --paper:#fffdf9; --muted:#79717b; --line:#ddd5cc; --rose:#c45678; --lavender:#352855; --cream:#ffe1b5; --shadow:0 25px 70px rgba(35,25,45,.13); }
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--wash);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.kicker{margin:0;color:#98526a;font:600 10px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.145em}.topbar{height:79px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(28px,calc((100vw - 1344px)/2));}.wordmark{color:var(--ink);text-decoration:none;font:700 14px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.13em;display:flex;align-items:center;gap:9px}.wordmark i{font-style:normal;color:var(--rose)}.logo-mark{width:29px;height:29px;display:grid;place-items:center;border-radius:50%;color:#fff;background:var(--ink);font:600 17px/1 Georgia,serif;letter-spacing:0}.private-status{margin:0;color:#68616c;font:10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.065em}.private-status span{display:inline-block;width:6px;height:6px;margin:0 8px 1px 0;border-radius:50%;background:#75a989;box-shadow:0 0 0 4px rgba(117,169,137,.12)}.about-button{border:0;background:transparent;padding:4px 0;color:#554f59;font-size:11px;text-decoration:underline;text-underline-offset:4px}.about-button span{font-size:14px;margin-left:5px}.intro{min-height:337px;display:flex;justify-content:space-between;gap:30px;padding:61px max(7.1%,calc((100vw - 1246px)/2));border-bottom:1px solid var(--line);position:relative;overflow:hidden}.intro:after{content:"";position:absolute;right:11%;bottom:-146px;width:285px;height:285px;border:1px solid #ded4d6;border-radius:50%;box-shadow:inset 0 0 0 35px rgba(235,221,218,.28),inset 0 0 0 70px rgba(235,221,218,.3)}.intro h1{position:relative;margin:12px 0 0;font:600 clamp(48px,5vw,72px)/.91 Georgia,"Times New Roman",serif;letter-spacing:-.06em}.intro h1 em{color:var(--rose);font-weight:600}.lede{position:relative;width:min(500px,100%);margin:21px 0 0;color:#6e6772;font-size:14px;line-height:1.65}.intro-note{position:relative;z-index:1;width:174px;display:grid;align-content:start;gap:5px;margin:27px 2.5% 0 0;font-size:10px}.intro-note span{margin-top:11px;padding-top:11px;border-top:1px solid #d0c8c0;color:#8d858d;font:9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em}.intro-note strong{color:#4d4751;font:500 10px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em}.workspace{max-width:1344px;margin:0 auto;padding:53px 0 67px}.workspace-heading{display:flex;justify-content:space-between;align-items:end;padding:0 7.1% 18px}.workspace h2,.settings-panel h2{margin:8px 0 0;font:600 27px/.95 Georgia,"Times New Roman",serif;letter-spacing:-.045em}.workspace-tools{display:flex;gap:7px}.small-button,.upload-button{min-height:35px;padding:9px 11px;border:1px solid #d5ccc3;background:rgba(255,255,255,.25);color:#625b65;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.03em}.small-button:disabled{opacity:.35;cursor:not-allowed}.upload-button{background:var(--ink);color:#fff;border-color:var(--ink);cursor:pointer}.studio{display:grid;grid-template-columns:190px minmax(0,1.49fr) minmax(328px,.76fr);min-height:656px;background:#faf8f4;border:1px solid #d8d0c8;box-shadow:var(--shadow)}.page-rail{padding:19px 13px 14px;border-right:1px solid #ddd5cc;background:#f0ece6;display:flex;flex-direction:column}.rail-header{display:flex;justify-content:space-between;align-items:center;color:#857b85;font:9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.07em}.rail-header b{font-weight:500;color:#9a536a}.drop-hint{height:139px;margin:19px 0 12px;padding:19px 10px;text-align:center;border:1px dashed #cfc5bf;color:#78717a;display:grid;place-items:center;align-content:center}.drop-hint[hidden]{display:none}.drop-hint .plus{display:grid;place-items:center;width:25px;height:25px;color:#9e536b;background:#faf8f4;border-radius:50%;font-size:19px;line-height:1}.drop-hint strong{display:block;margin-top:8px;color:#564e59;font:600 12px Georgia,serif}.drop-hint small{margin-top:5px;font-size:9px;line-height:1.4}.page-list{display:grid;gap:7px;overflow:auto;max-height:456px;padding-right:2px}.queue-page{position:relative;height:71px;padding:0;border:1px solid #d7cdc6;background:#e7e0d9;overflow:hidden}.queue-page:hover{border-color:#bc8191}.queue-page.active{border:2px solid #98526a;box-shadow:0 0 0 1px #98526a}.queue-page img{width:100%;height:100%;object-fit:cover;filter:grayscale(1)}.queue-page span{position:absolute;bottom:0;left:0;padding:4px 6px;color:#fff;background:rgba(31,27,39,.78);font:9px ui-monospace,SFMono-Regular,Menlo,monospace}.rail-note{margin:auto 2px 0;padding-top:13px;border-top:1px solid #d9d0c8;color:#958d94;font:8px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.preview-panel{min-width:0;padding:17px 17px 11px;border-right:1px solid #ddd5cc;display:flex;flex-direction:column}.preview-bar,.stage-footer{min-height:29px;display:flex;align-items:center;justify-content:space-between;gap:10px}.view-toggle{display:inline-flex;padding:3px;border:1px solid #d9d0c7;background:#eeebe5}.view-toggle button{padding:5px 8px;border:0;background:transparent;color:#77707a;font-size:10px}.view-toggle button.active{background:#fffdf9;color:var(--ink);box-shadow:0 1px 3px rgba(30,25,35,.09)}.preview-bar p{max-width:32%;margin:0;color:#857c85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:9px ui-monospace,SFMono-Regular,Menlo,monospace}.page-nav{display:flex;align-items:center;gap:6px;color:#847b85;font:9px ui-monospace,SFMono-Regular,Menlo,monospace}.page-nav button{width:22px;height:22px;padding:0;border:1px solid #d2c9c2;background:#fffdf9;color:#4b444e}.page-nav button:disabled{opacity:.3}.image-stage{position:relative;flex:1;min-height:520px;margin-top:12px;display:grid;place-items:center;overflow:hidden;background:#ded9d4}.image-stage img,.image-stage canvas{position:absolute;width:100%;height:100%;object-fit:contain;transform:translateZ(0)}.image-stage img{filter:grayscale(1) contrast(1.05)}.image-stage canvas{clip-path:inset(0 40% 0 0)}.image-stage.color-view img{visibility:hidden}.image-stage.color-view canvas{clip-path:none!important}.image-stage.original-view canvas{visibility:hidden}.stage-tag{position:absolute;z-index:4;top:14px;padding:5px 7px;background:rgba(255,253,249,.8);color:#665e67;backdrop-filter:blur(5px);font:9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.11em}.tag-result{left:14px;color:#904b62}.tag-original{right:14px}.color-view .tag-original,.original-view .tag-result{display:none}.welcome-stage{position:relative;z-index:8;width:min(326px,calc(100% - 35px));padding:28px 23px;text-align:center;background:rgba(255,253,249,.95);box-shadow:0 15px 37px rgba(42,32,47,.12)}.welcome-symbol{color:#bd6c83;font-size:21px}.welcome-stage h3{margin:11px 0 7px;font:600 21px Georgia,serif;letter-spacing:-.03em}.welcome-stage p{margin:0;color:#7b737d;font-size:11px;line-height:1.45}.underlined{margin-top:16px;padding:0 0 3px;border:0;border-bottom:1px solid #a77b87;color:#8e4b61;background:transparent;font-weight:600;font-size:11px}.underlined span{margin-left:6px}.compare-layer{position:relative;z-index:9;height:0}.compare-layer input{position:absolute;inset:auto 0 calc(0px + 0px);width:100%;height:var(--stage-height,520px);margin:0;opacity:0;transform:translateY(calc(-1 * var(--stage-height,520px)));cursor:ew-resize}.compare-layer #comparisonHandle{position:absolute;left:60%;bottom:0;width:1px;height:var(--stage-height,520px);transform:translateX(-50%);background:#fffdf9;box-shadow:0 0 0 1px rgba(37,28,42,.25);pointer-events:none}.compare-layer #comparisonHandle b{position:absolute;top:50%;left:50%;display:grid;place-items:center;width:28px;height:28px;transform:translate(-50%,-50%);border-radius:50%;background:#fffdf9;color:#403943;box-shadow:0 2px 10px rgba(27,18,34,.16);font-size:13px}.image-stage.color-view + .compare-layer,.image-stage.original-view + .compare-layer{display:none}.stage-footer{padding:10px 2px 0;color:#918891;font-size:9px}.stage-footer span{display:flex;align-items:center;gap:6px}.stage-footer b{color:#615963;font-weight:600}.stage-footer em{font-style:normal}.stage-footer i{width:6px;height:6px;background:#6fa77b;border-radius:50%}.settings-panel{padding:25px 25px 19px;background:var(--paper);display:flex;flex-direction:column}.settings-title{display:flex;justify-content:space-between;align-items:start;padding-bottom:19px}.settings-panel h2{font-size:26px}.settings-title button,.section-title button{border:0;background:transparent;padding:3px 0;color:#955166;font:9px ui-monospace,SFMono-Regular,Menlo,monospace}.settings-section{padding:16px 0;border-top:1px solid #e4ddd5}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;color:#8c838b;font:9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em}.section-title small{font-size:8px}.moods{display:grid;grid-template-columns:1fr 1fr;gap:7px}.mood{min-height:57px;display:flex;gap:8px;align-items:center;text-align:left;padding:7px;border:1px solid #e4ddd5;background:#fbf8f3}.mood:hover{border-color:#c49aaa}.mood.active{border-color:#a66f80;box-shadow:inset 0 0 0 1px #a66f80}.mood i{width:11px;height:36px;flex:0 0 11px;background:linear-gradient(#ffe4bf,#d26f91,#332556)}.mood-night{background:linear-gradient(#e8f2ff,#5171bf,#222250)!important}.mood-gold{background:linear-gradient(#fff5bb,#ee9f61,#8c414c)!important}.mood-aqua{background:linear-gradient(#d1fff0,#b05eb2,#193c59)!important}.mood b,.mood small{display:block}.mood b{color:#514a54;font-size:10px}.mood small{margin-top:3px;color:#938a92;font-size:8px;line-height:1.25}.palette-controls{display:flex;gap:6px}.palette-controls label{position:relative;flex:1;min-width:0;display:grid;grid-template-columns:19px 1fr;gap:5px;align-items:center;cursor:pointer}.palette-controls input{position:absolute;opacity:0}.palette-controls label>span{grid-row:span 2;width:19px;height:28px;border:1px solid rgba(30,25,40,.15);box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}.palette-controls b{display:block;overflow:hidden;color:#605862;text-overflow:ellipsis;white-space:nowrap;font-size:9px}.palette-controls em{color:#9a9198;font:8px ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal}.tune-section{padding-bottom:8px}.tuning-controls{display:grid;gap:10px}.tuning-controls.collapsed{display:none}.slider-row{display:grid;gap:4px}.slider-row span{display:flex;justify-content:space-between}.slider-row b{color:#615963;font-size:10px}.slider-row em{color:#9f959e;font:9px ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal}input[type=range]{width:100%;height:10px;margin:0;appearance:none;background:transparent}input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--rose) var(--fill,50%),#ded8d1 var(--fill,50%))}input[type=range]::-webkit-slider-thumb{width:11px;height:11px;margin-top:-4.5px;appearance:none;border:2px solid var(--rose);border-radius:50%;background:#fffdf9}input[type=range]::-moz-range-track{height:2px;background:#ded8d1}input[type=range]::-moz-range-progress{height:2px;background:var(--rose)}input[type=range]::-moz-range-thumb{width:9px;height:9px;border:2px solid var(--rose);border-radius:50%;background:#fffdf9}.settings-bottom{margin-top:auto;padding-top:13px;border-top:1px solid #e4ddd5}.rights{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:start;margin-bottom:11px;cursor:pointer}.rights input{position:absolute;opacity:0}.rights>span{display:block;width:14px;height:14px;margin-top:1px;border:1px solid #b9adb1;background:#fffdf9}.rights small{color:#837a84;font-size:9px;line-height:1.42}.rights input:checked+span{position:relative;border-color:var(--ink);background:var(--ink)}.rights input:checked+span:after{content:"✓";position:absolute;left:2px;top:-2px;color:#fff;font-size:10px}.primary{border:1px solid var(--ink);color:#fff;background:var(--ink);font-weight:600}.apply{width:100%;min-height:43px;padding:10px;font-size:11px}.apply b{float:right;color:#efa4ba;font-size:15px}.primary:disabled,.download:disabled{opacity:.38;cursor:not-allowed}.download{width:100%;min-height:37px;margin-top:7px;padding:8px 10px;border:1px solid #d1c8c1;color:#59515b;background:transparent;font-size:10px;font-weight:600}.download b{float:right;color:#965167;font-size:15px}.privacy-panel{position:fixed;right:24px;bottom:24px;z-index:30;width:min(520px,calc(100% - 48px));padding:31px;background:#fffdf9;box-shadow:0 17px 65px rgba(32,24,37,.24)}.privacy-panel button{position:absolute;right:17px;top:12px;border:0;background:none;color:#665c65;font-size:23px}.privacy-panel h2{max-width:430px;margin:11px 0 22px;font:600 27px/.96 Georgia,serif;letter-spacing:-.045em}.privacy-panel div{display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid #e5ddd6}.privacy-panel p:not(.kicker){margin:13px 0 0;color:#756d77;font-size:11px;line-height:1.6}footer{max-width:1344px;margin:auto;padding:20px 7.1% 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#867d86;font:8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.075em}.age-modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(28,22,32,.72);backdrop-filter:blur(12px);transition:opacity .25s,visibility .25s}.age-modal.hidden{opacity:0;visibility:hidden}.age-card{width:min(493px,100%);padding:42px;color:var(--ink);background:#fffdf9;box-shadow:0 22px 84px rgba(0,0,0,.25)}.age-badge{display:grid;place-items:center;width:39px;height:39px;border-radius:50%;color:#fff;background:var(--ink);font:600 11px ui-monospace,SFMono-Regular,Menlo,monospace}.age-card .kicker{margin-top:29px}.age-card h1{max-width:370px;margin:12px 0 0;font:600 36px/.98 Georgia,serif;letter-spacing:-.05em}.age-card>p:not(.kicker){margin:20px 0;color:#706873;font-size:12px;line-height:1.65}.rule-list{display:grid;border-top:1px solid #e4ddd5}.rule-list span{padding:9px 0;border-bottom:1px solid #e4ddd5;color:#5b535e;font-size:10px}.rule-list span:before{content:"✦";margin-right:10px;color:#b75b77}.modal-actions{display:flex;align-items:center;gap:17px;margin-top:24px}.modal-actions .primary{min-height:43px;padding:11px 15px;font-size:11px}.modal-actions .primary b{margin-left:13px;color:#efacbd;font-size:16px}.secondary{border:0;background:transparent;color:#8d7180;text-decoration:underline;text-underline-offset:4px;font-size:11px}.closed-message{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:var(--wash);text-align:center}.closed-message strong{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em}.closed-message p{color:#716974;font-size:12px}
+@media(max-width:1050px){.workspace{padding-left:22px;padding-right:22px}.studio{grid-template-columns:172px minmax(0,1fr);}.settings-panel{grid-column:1/-1;border-top:1px solid #ddd5cc}.page-rail{border-bottom:0}.preview-panel{border-right:0}.settings-bottom{margin-top:27px}.settings-panel{min-height:460px}.settings-bottom{max-width:420px}.image-stage{min-height:500px}}
+@media(max-width:670px){.topbar{height:66px;padding:0 15px}.private-status{display:none}.about-button{font-size:10px}.intro{min-height:336px;padding:48px 15px}.intro-note{display:none}.intro h1{font-size:52px}.lede{font-size:12px;width:95%}.workspace{padding:38px 0}.workspace-heading{padding:0 15px 15px}.workspace h2{font-size:24px}.small-button{display:none}.studio{display:block;border-left:0;border-right:0}.page-rail{min-height:163px;padding:15px;border-right:0;border-bottom:1px solid #ddd5cc}.drop-hint{height:73px;margin:12px 0;padding:9px;display:block;text-align:left;padding-left:36px;position:relative}.drop-hint .plus{position:absolute;left:9px;top:12px}.drop-hint strong{margin:3px 0 0;font-size:11px}.drop-hint small{display:block;margin-top:3px;font-size:8px}.page-list{display:flex;max-height:75px;overflow:auto}.queue-page{min-width:83px;height:65px}.rail-note{display:none}.preview-panel{padding:12px}.preview-bar p{display:none}.image-stage{min-height:440px}.settings-panel{padding:23px 17px 18px}.palette-controls{gap:9px}.privacy-panel{right:15px;bottom:15px;width:calc(100% - 30px);padding:27px 23px}.privacy-panel div{grid-template-columns:1fr;gap:0}.privacy-panel h2{font-size:24px}footer{padding:17px 15px 24px;gap:9px;flex-direction:column}.age-card{padding:32px 27px}.age-card h1{font-size:30px}}
+
+  </style>
+</head>
+<body>
+  <div class="age-modal" id="ageModal" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
+    <section class="age-card">
+      <div class="age-badge">18+</div>
+      <p class="kicker">PRIVATE LOCAL TOOL</p>
+      <h1 id="ageTitle">Your reading stays on your device.</h1>
+      <p>This local colorizer is for personal use with fictional, adult manga pages that you are allowed to process. No images are uploaded or stored by this app.</p>
+      <div class="rule-list">
+        <span>Adult fictional characters only</span>
+        <span>No real people or likenesses</span>
+        <span>No minors or minor-coded characters</span>
+      </div>
+      <div class="modal-actions">
+        <button id="enterApp" class="primary">I’m 18+ · Enter studio <b>→</b></button>
+        <button id="closeApp" class="secondary">Leave</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="closed-message" id="closedMessage" hidden>
+    <div><strong>MANGA TONE</strong><p>This private workspace is for adult fictional artwork only.</p></div>
+  </div>
+
+  <main id="app" aria-hidden="true">
+    <header class="topbar">
+      <a class="wordmark" href="#top" aria-label="Manga Tone private colorizer">
+        <span class="logo-mark">M</span>
+        <span>MANGA <i>TONE</i></span>
+      </a>
+      <p class="private-status"><span></span> PRIVATE SESSION · NOTHING LEAVES THIS BROWSER</p>
+      <button class="about-button" id="privacyButton" type="button">How private mode works <span>↗</span></button>
+    </header>
+
+    <section class="intro" id="top">
+      <div>
+        <p class="kicker">MANGA COLORIZER / LOCAL EDITION</p>
+        <h1>Read in <em>your</em><br />own color.</h1>
+        <p class="lede">Drop black-and-white manga pages, choose a color atmosphere, and export the result. This lightweight tool works entirely in your browser — no account, no cloud, no history.</p>
+      </div>
+      <div class="intro-note">
+        <span>MADE FOR</span><strong>Personal color<br />studies & reading</strong>
+        <span>PROCESSING</span><strong>On-device<br />palette mapping</strong>
+      </div>
+    </section>
+
+    <section class="workspace" aria-labelledby="workspaceTitle">
+      <div class="workspace-heading">
+        <div><p class="kicker">YOUR PRIVATE DESK</p><h2 id="workspaceTitle">Manga color studio</h2></div>
+        <div class="workspace-tools">
+          <button class="small-button" id="clearAll" type="button" disabled>Clear session</button>
+          <label class="upload-button" for="pageUpload">+ Add manga pages</label>
+          <input id="pageUpload" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" multiple hidden />
+        </div>
+      </div>
+
+      <div class="studio">
+        <aside class="page-rail" aria-label="Page queue">
+          <div class="rail-header"><span>PAGE QUEUE</span><b id="pageCount">0 PAGES</b></div>
+          <div class="drop-hint" id="dropHint">
+            <span class="plus">+</span>
+            <strong>Start a private set</strong>
+            <small>Drop page files here<br />or use Add manga pages</small>
+          </div>
+          <div class="page-list" id="pageList" aria-live="polite"></div>
+          <p class="rail-note">PNG · JPG · WebP · SVG<br />15 MB max each · up to 30 pages</p>
+        </aside>
+
+        <section class="preview-panel" aria-label="Color preview">
+          <div class="preview-bar">
+            <div class="view-toggle" role="group" aria-label="Preview view">
+              <button type="button" class="active" data-view="split">Compare</button>
+              <button type="button" data-view="color">Color</button>
+              <button type="button" data-view="original">B&W</button>
+            </div>
+            <p id="currentFileLabel">No page selected</p>
+            <div class="page-nav">
+              <button id="previousPage" type="button" aria-label="Previous page" disabled>←</button>
+              <span id="pagePosition">— / —</span>
+              <button id="nextPage" type="button" aria-label="Next page" disabled>→</button>
+            </div>
+          </div>
+
+          <div class="image-stage" id="imageStage">
+            <img id="originalImage" alt="Original black and white manga page" />
+            <canvas id="resultCanvas" aria-label="Colorized manga page"></canvas>
+            <div class="stage-tag tag-result">COLOR</div>
+            <div class="stage-tag tag-original">B&amp;W</div>
+            <div class="welcome-stage" id="welcomeStage">
+              <div class="welcome-symbol">✦</div>
+              <h3>Open a page to begin</h3>
+              <p>Your artwork is held only in the current browser memory.</p>
+              <button id="welcomeUpload" class="underlined" type="button">Choose manga pages <span>→</span></button>
+            </div>
+          </div>
+          <div class="compare-layer" id="compareLayer">
+            <input type="range" id="comparison" min="0" max="100" value="60" aria-label="Compare original and colorized page" />
+            <span id="comparisonHandle"><b>↔</b></span>
+          </div>
+          <div class="stage-footer"><span><i id="processingDot"></i><b id="processingText">Waiting for a page</b><em id="processingDetail">— local-only workspace</em></span><span id="imageSize">—</span></div>
+        </section>
+
+        <aside class="settings-panel" aria-label="Color settings">
+          <div class="settings-title"><div><p class="kicker">COLOR CONTROLS</p><h2>Set the scene.</h2></div><button id="resetSettings" type="button">Reset ↺</button></div>
+
+          <section class="settings-section">
+            <div class="section-title"><span>01 / QUICK MOODS</span><small>SELECT ONE</small></div>
+            <div class="moods" id="moods">
+              <button class="mood active" data-mood="rose" type="button"><i class="mood-rose"></i><span><b>Rose room</b><small>Plum · blush · cream</small></span></button>
+              <button class="mood" data-mood="night" type="button"><i class="mood-night"></i><span><b>Night train</b><small>Indigo · blue · moon</small></span></button>
+              <button class="mood" data-mood="gold" type="button"><i class="mood-gold"></i><span><b>Golden hour</b><small>Rust · amber · ivory</small></span></button>
+              <button class="mood" data-mood="aqua" type="button"><i class="mood-aqua"></i><span><b>Neo aqua</b><small>Teal · lilac · mint</small></span></button>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="section-title"><span>02 / CUSTOM PALETTE</span><button id="shufflePalette" type="button">Shuffle ⟳</button></div>
+            <div class="palette-controls">
+              <label><input id="darkColor" type="color" value="#332556" /><span id="darkSwatch"></span><b>Ink & shadows</b><em id="darkValue">#332556</em></label>
+              <label><input id="midColor" type="color" value="#D26F91" /><span id="midSwatch"></span><b>Midtones</b><em id="midValue">#D26F91</em></label>
+              <label><input id="lightColor" type="color" value="#FFE4BF" /><span id="lightSwatch"></span><b>Light & paper</b><em id="lightValue">#FFE4BF</em></label>
+            </div>
+          </section>
+
+          <section class="settings-section tune-section">
+            <div class="section-title"><span>03 / PAGE TUNING</span><button id="tuneToggle" type="button" aria-expanded="true">−</button></div>
+            <div id="tuningControls" class="tuning-controls">
+              <label class="slider-row"><span><b>Color coverage</b><em id="coverageReadout">76%</em></span><input id="coverage" type="range" min="0" max="100" value="76" /></label>
+              <label class="slider-row"><span><b>Protect dark ink</b><em id="inkReadout">84%</em></span><input id="ink" type="range" min="0" max="100" value="84" /></label>
+              <label class="slider-row"><span><b>Color intensity</b><em id="intensityReadout">22</em></span><input id="intensity" type="range" min="-40" max="50" value="22" /></label>
+              <label class="slider-row"><span><b>Paper warmth</b><em id="warmthReadout">8</em></span><input id="warmth" type="range" min="-40" max="40" value="8" /></label>
+            </div>
+          </section>
+
+          <div class="settings-bottom">
+            <label class="rights"><input id="rights" type="checkbox" /><span></span><small>I’m editing adult fictional artwork that I may use privately.</small></label>
+            <button id="applyButton" class="primary apply" type="button" disabled>Apply color to this page <b>✦</b></button>
+            <button id="downloadButton" class="download" type="button" disabled>Download current PNG <b>↓</b></button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="privacy-panel" id="privacyPanel" hidden>
+      <button id="closePrivacy" aria-label="Close privacy information">×</button>
+      <p class="kicker">PRIVATE MODE EXPLAINED</p>
+      <h2>Files are processed in your browser’s temporary memory.</h2>
+      <div><p>There is no upload API, database, analytics, sign-in, or remote image source in this project. Closing or refreshing this page clears your active set.</p><p>For extra privacy, download this folder and open it from your own computer or use it offline after saving the files locally.</p></div>
+    </section>
+
+    <footer><span>MANGA TONE · LOCAL EDITION</span><span>ADULT FICTIONAL ART ONLY</span><span>NO CLOUD · NO ACCOUNT · NO HISTORY</span></footer>
+  </main>
+  <script>
+(() => {
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => [...document.querySelectorAll(selector)];
+  const maxFiles = 30;
+  const acceptedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+  const canvas = $('#resultCanvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const sourceImage = new Image();
+  const originalImage = $('#originalImage');
+  const imageStage = $('#imageStage');
+  const comparison = $('#comparison');
+  const comparisonHandle = $('#comparisonHandle');
+  const pageList = $('#pageList');
+  const dropHint = $('#dropHint');
+  const pageUpload = $('#pageUpload');
+  const controls = { dark: $('#darkColor'), mid: $('#midColor'), light: $('#lightColor'), coverage: $('#coverage'), ink: $('#ink'), intensity: $('#intensity'), warmth: $('#warmth') };
+  const palettes = {
+    rose: { dark: '#332556', mid: '#D26F91', light: '#FFE4BF', coverage: 76, ink: 84, intensity: 22, warmth: 8 },
+    night: { dark: '#1E2455', mid: '#5271BF', light: '#DFECFF', coverage: 82, ink: 88, intensity: 19, warmth: -16 },
+    gold: { dark: '#823F4D', mid: '#E99560', light: '#FFF1B9', coverage: 72, ink: 82, intensity: 24, warmth: 27 },
+    aqua: { dark: '#1C3B59', mid: '#AD5EAB', light: '#D0FFE8', coverage: 86, ink: 86, intensity: 33, warmth: -5 }
+  };
+  const pages = [];
+  let currentPageIndex = -1;
+  let isReady = false;
+  let renderDelay;
+
+  const hexToRgb = (hex) => { const v = hex.replace('#',''); return { r: parseInt(v.substring(0,2),16), g: parseInt(v.substring(2,4),16), b: parseInt(v.substring(4,6),16) }; };
+  const clamp = (v) => Math.max(0, Math.min(255, v));
+  const blend = (start, end, amount) => start + (end - start) * amount;
+
+  function updateStatus(title, detail, working = false) {
+    $('#processingText').textContent = title;
+    $('#processingDetail').textContent = `— ${detail}`;
+    $('#processingDot').style.background = working ? '#e4a45d' : '#6fa77b';
+  }
+  function setRangeUi(input) {
+    const fill = ((+input.value - +input.min) / (+input.max - +input.min)) * 100;
+    input.style.setProperty('--fill', `${fill}%`);
+    $(`#${input.id}Readout`).textContent = `${input.value}${['coverage','ink'].includes(input.id) ? '%' : ''}`;
+  }
+  function setColorUi(input, type) {
+    const hex = input.value.toUpperCase();
+    $(`#${type}Swatch`).style.background = hex;
+    $(`#${type}Value`).textContent = hex;
+  }
+  function syncUi() {
+    setColorUi(controls.dark, 'dark'); setColorUi(controls.mid, 'mid'); setColorUi(controls.light, 'light');
+    [controls.coverage, controls.ink, controls.intensity, controls.warmth].forEach(setRangeUi);
+  }
+  function updateActions() {
+    const enabled = isReady && $('#rights').checked;
+    $('#applyButton').disabled = !enabled;
+    $('#downloadButton').disabled = !enabled;
+  }
+  function fitCanvas() {
+    const largestSide = Math.max(sourceImage.naturalWidth, sourceImage.naturalHeight);
+    const scale = Math.min(1, 2200 / largestSide);
+    canvas.width = Math.max(1, Math.round(sourceImage.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(sourceImage.naturalHeight * scale));
+  }
+  function renderColor() {
+    if (!isReady) return;
+    fitCanvas();
+    const scratch = document.createElement('canvas');
+    scratch.width = canvas.width; scratch.height = canvas.height;
+    const scratchCtx = scratch.getContext('2d', { willReadFrequently: true });
+    scratchCtx.drawImage(sourceImage, 0, 0, scratch.width, scratch.height);
+    const pixels = scratchCtx.getImageData(0, 0, scratch.width, scratch.height);
+    const data = pixels.data;
+    const dark = hexToRgb(controls.dark.value), mid = hexToRgb(controls.mid.value), light = hexToRgb(controls.light.value);
+    const coverage = +controls.coverage.value / 100;
+    const inkProtection = +controls.ink.value / 100;
+    const intensity = +controls.intensity.value / 50;
+    const warmth = +controls.warmth.value / 40;
+    for (let pos = 0; pos < data.length; pos += 4) {
+      const oR = data[pos], oG = data[pos+1], oB = data[pos+2];
+      if (data[pos+3] === 0) continue;
+      const luma = (oR * .2126 + oG * .7152 + oB * .0722) / 255;
+      const from = luma < .5 ? dark : mid, to = luma < .5 ? mid : light;
+      const t = luma < .5 ? luma * 2 : (luma - .5) * 2;
+      let r = blend(from.r, to.r, t), g = blend(from.g, to.g, t), b = blend(from.b, to.b, t);
+      const avg = (r+g+b)/3, saturation = 1 + intensity*.38;
+      r = blend(avg, r, saturation); g = blend(avg, g, saturation); b = blend(avg, b, saturation);
+      r += warmth * 15; b -= warmth * 14;
+      // Preserve line-work in darker regions; white paper remains soft and clean.
+      const localCoverage = coverage * (1 - Math.max(0, (.26 - luma) / .26) * inkProtection);
+      data[pos] = clamp(blend(oR, r, localCoverage));
+      data[pos+1] = clamp(blend(oG, g, localCoverage));
+      data[pos+2] = clamp(blend(oB, b, localCoverage));
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(pixels, 0, 0);
+    updateStatus('Color pass ready', 'processed only on this device');
+  }
+  function scheduleRender() {
+    if (!isReady) return;
+    updateStatus('Updating colors', 'remapping page locally', true);
+    clearTimeout(renderDelay);
+    renderDelay = setTimeout(renderColor, 70);
+  }
+  function syncStageHeight() {
+    document.documentElement.style.setProperty('--stage-height', `${imageStage.clientHeight}px`);
+  }
+  function setComparison(value) {
+    canvas.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
+    comparisonHandle.style.left = `${value}%`;
+  }
+  function renderQueue() {
+    pageList.innerHTML = '';
+    pages.forEach((page, index) => {
+      const button = document.createElement('button');
+      button.className = `queue-page${index === currentPageIndex ? ' active' : ''}`;
+      button.type = 'button'; button.title = page.file.name;
+      button.innerHTML = `<img src="${page.url}" alt="Manga page ${index + 1}"><span>${String(index+1).padStart(2,'0')}</span>`;
+      button.addEventListener('click', () => selectPage(index));
+      pageList.appendChild(button);
+    });
+    dropHint.hidden = pages.length > 0;
+    $('#pageCount').textContent = `${pages.length} ${pages.length === 1 ? 'PAGE' : 'PAGES'}`;
+    $('#clearAll').disabled = pages.length === 0;
+    $('#previousPage').disabled = currentPageIndex < 1;
+    $('#nextPage').disabled = currentPageIndex === -1 || currentPageIndex >= pages.length - 1;
+    $('#pagePosition').textContent = currentPageIndex === -1 ? '— / —' : `${currentPageIndex + 1} / ${pages.length}`;
+  }
+  function selectPage(index) {
+    const page = pages[index]; if (!page) return;
+    isReady = false; updateActions(); currentPageIndex = index; renderQueue();
+    updateStatus('Loading page', 'preparing your local canvas', true);
+    sourceImage.onload = () => {
+      isReady = true;
+      originalImage.src = page.url; originalImage.alt = `Original page ${index + 1}: ${page.file.name}`;
+      $('#currentFileLabel').textContent = page.file.name;
+      $('#imageSize').textContent = `${sourceImage.naturalWidth} × ${sourceImage.naturalHeight}`;
+      $('#welcomeStage').hidden = true;
+      renderColor(); updateActions();
+    };
+    sourceImage.onerror = () => { isReady = false; updateActions(); updateStatus('Could not load page', 'choose a supported image file'); };
+    sourceImage.src = page.url;
+  }
+  function addFiles(fileList) {
+    const incoming = [...fileList];
+    const availableSlots = maxFiles - pages.length;
+    const valid = incoming.filter((file) => acceptedTypes.includes(file.type) && file.size <= 15 * 1024 * 1024).slice(0, availableSlots);
+    if (!valid.length) { updateStatus('No compatible page added', 'PNG, JPG, WebP, or SVG under 15 MB'); return; }
+    valid.forEach((file) => pages.push({ file, url: URL.createObjectURL(file) }));
+    selectPage(currentPageIndex === -1 ? 0 : currentPageIndex);
+    if (incoming.length > valid.length) updateStatus('Some pages skipped', `up to ${maxFiles} files, 15 MB each`);
+  }
+  function chooseFiles() { pageUpload.click(); }
+  function clearSession() {
+    pages.forEach((page) => URL.revokeObjectURL(page.url)); pages.splice(0); currentPageIndex = -1; isReady = false;
+    originalImage.removeAttribute('src'); ctx.clearRect(0,0,canvas.width,canvas.height); canvas.width = 0; canvas.height = 0;
+    $('#welcomeStage').hidden = false; $('#currentFileLabel').textContent = 'No page selected'; $('#imageSize').textContent = '—';
+    updateStatus('Waiting for a page', 'local-only workspace'); updateActions(); renderQueue();
+  }
+  function applyPalette(name) {
+    const palette = palettes[name];
+    Object.entries(palette).forEach(([key,value]) => controls[key].value = value);
+    $$('.mood').forEach((mood) => mood.classList.toggle('active', mood.dataset.mood === name)); syncUi(); scheduleRender();
+  }
+  function randomColor(lightnessMin, lightnessMax) {
+    const h = Math.floor(Math.random()*360), s = 43 + Math.floor(Math.random()*37), l = lightnessMin + Math.floor(Math.random()*(lightnessMax-lightnessMin));
+    const c = (1-Math.abs(2*l/100-1))*s/100, x=c*(1-Math.abs((h/60)%2-1)), m=l/100-c/2;
+    const [r,g,b] = h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];
+    return '#'+[r,g,b].map(v=>Math.round((v+m)*255).toString(16).padStart(2,'0')).join('').toUpperCase();
+  }
+
+  $('#enterApp').addEventListener('click', () => { $('#ageModal').classList.add('hidden'); $('#app').setAttribute('aria-hidden','false'); });
+  $('#closeApp').addEventListener('click', () => { $('#ageModal').hidden = true; $('#closedMessage').hidden = false; });
+  pageUpload.addEventListener('change', (event) => { addFiles(event.target.files); event.target.value = ''; });
+  $('#welcomeUpload').addEventListener('click', chooseFiles);
+  $('.upload-button').addEventListener('click', () => {});
+  ['dragenter','dragover'].forEach(type => $('.page-rail').addEventListener(type, event => { event.preventDefault(); $('.page-rail').style.outline = '2px dashed #b9677d'; $('.page-rail').style.outlineOffset = '-5px'; }));
+  ['dragleave','drop'].forEach(type => $('.page-rail').addEventListener(type, event => { event.preventDefault(); $('.page-rail').style.outline = ''; $('.page-rail').style.outlineOffset = ''; }));
+  $('.page-rail').addEventListener('drop', event => addFiles(event.dataTransfer.files));
+  comparison.addEventListener('input', event => setComparison(event.target.value));
+  $$('.view-toggle button').forEach(button => button.addEventListener('click', () => { $$('.view-toggle button').forEach(item=>item.classList.toggle('active',item===button)); imageStage.classList.remove('color-view','original-view'); if(button.dataset.view === 'color') imageStage.classList.add('color-view'); if(button.dataset.view === 'original') imageStage.classList.add('original-view'); }));
+  $('#previousPage').addEventListener('click', () => selectPage(currentPageIndex-1)); $('#nextPage').addEventListener('click', () => selectPage(currentPageIndex+1));
+  Object.entries(controls).forEach(([key,input]) => input.addEventListener('input', () => { if(['dark','mid','light'].includes(key)) setColorUi(input,key); else setRangeUi(input); $$('.mood').forEach(mood=>mood.classList.remove('active')); scheduleRender(); }));
+  $$('.mood').forEach(button => button.addEventListener('click', () => applyPalette(button.dataset.mood)));
+  $('#shufflePalette').addEventListener('click', () => { controls.dark.value=randomColor(20,38); controls.mid.value=randomColor(43,62); controls.light.value=randomColor(75,92); syncUi(); $$('.mood').forEach(mood=>mood.classList.remove('active')); scheduleRender(); });
+  $('#resetSettings').addEventListener('click', () => applyPalette('rose'));
+  $('#tuneToggle').addEventListener('click', event => { const collapsed=$('#tuningControls').classList.toggle('collapsed'); event.currentTarget.textContent=collapsed?'+':'−'; event.currentTarget.setAttribute('aria-expanded',String(!collapsed)); });
+  $('#rights').addEventListener('change', updateActions);
+  $('#applyButton').addEventListener('click', () => { updateStatus('Applying color pass', 'rendering the current page locally', true); setTimeout(renderColor,100); });
+  $('#downloadButton').addEventListener('click', () => { if(!isReady) return; const link=document.createElement('a'); const name=pages[currentPageIndex].file.name.replace(/\.[^/.]+$/,'').replace(/[^a-z0-9_-]/gi,'-').toLowerCase(); link.href=canvas.toDataURL('image/png'); link.download=`${name || 'manga-page'}-color.png`; link.click(); updateStatus('PNG saved', 'downloaded to your device'); });
+  $('#clearAll').addEventListener('click', clearSession);
+  $('#privacyButton').addEventListener('click', () => $('#privacyPanel').hidden=false); $('#closePrivacy').addEventListener('click', () => $('#privacyPanel').hidden=true);
+  syncUi(); syncStageHeight(); setComparison(comparison.value); renderQueue();
+  new ResizeObserver(syncStageHeight).observe(imageStage);
+})();
+
+  </script>
+</body>
+</html>
