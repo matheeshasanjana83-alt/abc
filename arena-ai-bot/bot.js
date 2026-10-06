@@ -64,6 +64,7 @@ const log = (t) => console.log(`[${new Date().toLocaleTimeString('en-GB')}] ${t}
 let pairingAsked = false;
 
 function ask(q) {
+    console.log('\n' + q.trim() + '\n   (panel එකේ නම් "Type a command" box එකේ number එක ගහලා Enter)');   // panels hide prompts without newline
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     return new Promise((r) => rl.question(q, (a) => { rl.close(); r(a); }));
 }

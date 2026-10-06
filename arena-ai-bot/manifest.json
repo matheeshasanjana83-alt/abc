@@ -1,6 +1,6 @@
 {
-  "version": "2.4.1",
-  "notes": "settings.json \"maxMB\" = download size limit (eg 2000 on big panels)",
+  "version": "2.4.2",
+  "notes": "Panel: phone-number prompt now visible in panel console",
   "files": [
     "bot.js",
     "ai.js",
