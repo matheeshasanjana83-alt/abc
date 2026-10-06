@@ -35,6 +35,10 @@ const seen = new Set();              // processed message ids (dedupe notify/app
 const STARTED = Math.floor(Date.now() / 1000);
 let announced = false;
 const ME = { pn: null, lid: null };
+function saveSettingsPhone(num) {
+    const f = require('path').join(__dirname, 'settings.json');
+    try { let d = {}; try { d = JSON.parse(require('fs').readFileSync(f, 'utf8')); } catch { } if (d.phone !== num) { d.phone = num; require('fs').writeFileSync(f, JSON.stringify(d, null, 2)); } } catch { }
+}
 function readSettingsPhone() { try { return JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'settings.json'), 'utf8')).phone || ''; } catch { return ''; } }   // our own JIDs (set on connect)
 
 // strip device part:  "9476xxxx:12@s.whatsapp.net" → "9476xxxx@s.whatsapp.net"
@@ -95,6 +99,13 @@ const HELP = `🤖 *Arena AI*
 📥 Download support: direct links, GitHub, Google Drive, MediaFire, MEGA, Dropbox, Pixeldrain, litterbox/catbox, x0.at, filebin...
 📏 Max: ${human(MAX_BYTES)} per file`;
 
+let botStatus = 'starting';
+if (process.env.SERVER_PORT || process.env.ARENA_ON_PANEL) {
+    try {
+        require('http').createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'application/json' }); r.end(JSON.stringify({ bot: 'Arena AI', status: botStatus, number: ME.pn, uptime: Math.floor(process.uptime()) })); })
+            .on('error', () => { }).listen(parseInt(process.env.SERVER_PORT || '3000', 10), '0.0.0.0');
+    } catch { }
+}
 async function start() {
     const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } = await loadBaileys();
     fs.mkdirSync(AUTH, { recursive: true });
@@ -127,6 +138,9 @@ async function start() {
             let num = String(process.env.WA_PHONE_NUMBER || readSettingsPhone() || '').replace(/\D/g, '');
             if (!num) num = String(await ask('📱 ඔයාගේ WhatsApp number එක (උදා 94771234567): ')).replace(/\D/g, '');
             if (num.startsWith('0')) num = '94' + num.slice(1);
+            if (num.length < 9 || num.length > 15) { log(`❌ "${num}" හරි number එකක් නෙවෙයි (උදා 94771234567). Restart කරලා ආයෙත් ගහන්න.`); pairingAsked = false; return; }
+            saveSettingsPhone(num);   // reconnects / expired codes → new code automatically, no retyping
+            log(`⏳ ${num} එකට pairing code එකක් ඉල්ලනවා...`);
             try {
                 let code;
                 for (let i = 0; i < 3 && !code; i++) {
@@ -139,8 +153,10 @@ async function start() {
                 console.log('════════════════════════════════════');
                 console.log('WhatsApp → Linked devices → Link a device →');
                 console.log('"Link with phone number instead" → මේ code එක ගහන්න\n');
-            } catch (e) { log('❌ Pairing code fail: ' + e.message); pairingAsked = false; }
+                console.log('⏳ Code එක ගහනකම් ඉන්නවා (විනාඩියකින් expire වුණොත් අලුත් code එකක් auto එනවා)\n');
+            } catch (e) { log(`❌ Pairing code fail: ${e.message} (code ${e?.output?.statusCode ?? '?'})`); pairingAsked = false; }
         }
+        if (connection) botStatus = connection;
         if (connection === 'open') {
             ME.pn = bareJid(sock.user?.id); ME.lid = bareJid(sock.user?.lid);
             log(`👤 me: ${ME.pn}${ME.lid ? '  /  ' + ME.lid : ''}`);

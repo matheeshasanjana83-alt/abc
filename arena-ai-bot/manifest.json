@@ -1,6 +1,6 @@
 {
-  "version": "2.4.2",
-  "notes": "Panel: phone-number prompt now visible in panel console",
+  "version": "2.4.3",
+  "notes": "Panel pairing: number saved (auto new code on expiry), clearer errors, status server on SERVER_PORT",
   "files": [
     "bot.js",
     "ai.js",
