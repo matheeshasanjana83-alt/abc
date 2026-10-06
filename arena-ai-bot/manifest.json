@@ -1,0 +1,5 @@
+{
+  "version": "2.2.0",
+  "notes": ".update command (GitHub auto-update, pair කරන්න ඕනේ නෑ) + auto rollback",
+  "files": ["bot.js", "ai.js", "downloader.js", "resolvers.js", "updater.js", "launcher.js", "package.json", "termux-setup.sh", "test.js", "README-SI.txt", "manifest.json", ".gitignore"]
+}
