@@ -37,6 +37,19 @@ const mk = (text, fromMe = true, jid = ME) => ({ key: { id: 'IN' + (++n), remote
     const ds = mk(''); ds.message = { deviceSentMessage: { destinationJid: ME, message: { conversation: '.ping' } } };
     r = await run(ds); t('deviceSentMessage wrapper → .ping වැඩ', r.some(x => /Pong/.test(x.text || '')));
 
+    // ───────── v2.3: self-chat reply JID ("Waiting for this message" fix) ─────────
+    const { replyJid, ME: me } = require('./bot');
+    me.pn = '94760552994@s.whatsapp.net'; me.lid = '35189220741167@lid';
+    t('self chat device LID → phone JID', replyJid({ remoteJid: '35189220741167:0@lid' }) === me.pn);
+    t('self chat device PN → bare phone JID', replyJid({ remoteJid: '94760552994:0@s.whatsapp.net' }) === me.pn);
+    t('self chat LID + alt → phone JID', replyJid({ remoteJid: '35189220741167@lid', remoteJidAlt: '94760552994@s.whatsapp.net' }) === me.pn);
+    t('other @lid chat with PN alt → PN', replyJid({ remoteJid: '1234567890123@lid', remoteJidAlt: '94771112222@s.whatsapp.net' }) === '94771112222@s.whatsapp.net');
+    t('group jid unchanged', replyJid({ remoteJid: '120363000@g.us' }) === '120363000@g.us');
+    out.length = 0;
+    await onMessages({ type: 'notify', messages: [{ key: { id: 'LID1', remoteJid: '35189220741167:0@lid', fromMe: true }, message: { conversation: '.ping' } }] }, send);
+    t('.ping from device-LID self chat → reply sent to phone JID', out.length > 0 && out.every(x => x.jid === me.pn));
+    me.pn = null; me.lid = null;
+
     // ───────── AI tests (fake Gemini/Groq servers) ─────────
     const ai = require('./ai');
     const realFetch = global.fetch; const calls = [];

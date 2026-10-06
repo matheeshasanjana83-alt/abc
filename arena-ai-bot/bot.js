@@ -19,6 +19,25 @@ const msgStore = new Map();          // recent messages → getMessage() for ret
 const seen = new Set();              // processed message ids (dedupe notify/append)
 const STARTED = Math.floor(Date.now() / 1000);
 let announced = false;
+const ME = { pn: null, lid: null };   // our own JIDs (set on connect)
+
+// strip device part:  "9476xxxx:12@s.whatsapp.net" → "9476xxxx@s.whatsapp.net"
+const bareJid = (j) => { if (!j) return j; const [u, srv] = String(j).split('@'); return u.split(':')[0] + '@' + srv; };
+
+/**
+ * Where to send replies.  Baileys v7 gives self-chat messages a DEVICE / LID jid as remoteJid
+ * (e.g. "35189220741167:0@lid") — replying there shows "Waiting for this message" on the phone.
+ * → self chat always goes to our own phone-number JID; other @lid chats use their PN alt if known.
+ */
+function replyJid(key) {
+    const rj = key?.remoteJid || '';
+    if (rj.endsWith('@g.us')) return rj;
+    const b = bareJid(rj), alt = bareJid(key?.remoteJidAlt);
+    const isMe = (j) => !!j && (j === ME.pn || j === ME.lid);
+    if (isMe(b) || isMe(alt)) return ME.pn || (b.endsWith('@s.whatsapp.net') ? b : alt) || b;
+    if (b.endsWith('@lid') && alt && alt.endsWith('@s.whatsapp.net')) return alt;
+    return b;
+}
 const retryCache = (() => { const m = new Map(); return { get: (k) => m.get(k), set: (k, v) => { m.set(k, v); if (m.size > 1000) m.delete(m.keys().next().value); }, del: (k) => m.delete(k), flushAll: () => m.clear() }; })();
 function remember(msg) {
     if (!msg?.key?.id || !msg.message) return;
@@ -106,10 +125,12 @@ async function start() {
             } catch (e) { log('❌ Pairing code fail: ' + e.message); pairingAsked = false; }
         }
         if (connection === 'open') {
+            ME.pn = bareJid(sock.user?.id); ME.lid = bareJid(sock.user?.lid);
+            log(`👤 me: ${ME.pn}${ME.lid ? '  /  ' + ME.lid : ''}`);
             log('✅ WhatsApp Connected! "Message yourself" chat එකේ .ping ගහලා බලන්න');
             if (announced) return;
             announced = true;
-            try { await send(sock.user.id.split(':')[0] + '@s.whatsapp.net', { text: '✅ *Arena AI online!*\n\n' + HELP }); } catch { }
+            try { await send(ME.pn, { text: '✅ *Arena AI online!*\n\n' + HELP }); } catch { }
         }
         if (connection === 'close') {
             const code = lastDisconnect?.error?.output?.statusCode;
@@ -139,8 +160,9 @@ async function onMessages({ messages, type }, send, del = async () => { }) {
                 seen.add(msg.key.id); if (seen.size > 1000) seen.delete(seen.values().next().value);
                 const text = getText(msg.message);
                 if (!text.startsWith('.')) continue;
-                const jid = msg.key.remoteJid;
-                log(`📩 command: ${text.slice(0, 60)}  (${type})`);
+                const jid = replyJid(msg.key);
+                log(`📩 command: ${text.slice(0, 60)}  (${type})  ${msg.key.remoteJid}${jid !== msg.key.remoteJid ? ' → ' + jid : ''}`);
+                msg.key = { ...msg.key, remoteJid: jid };   // quote/delete with the normalized chat jid too
                 const [cmd, ...rest] = text.split(/\s+/);
                 const c = cmd.toLowerCase();
 
@@ -267,7 +289,7 @@ async function handleDownload(send, jid, msg, link) {
 
 process.on('unhandledRejection', (e) => log('unhandled: ' + (e?.message || e)));
 process.on('uncaughtException', (e) => log('uncaught: ' + e.message));
-module.exports = { handleDownload, getText, onMessages };
+module.exports = { handleDownload, getText, onMessages, replyJid, ME };
 if (require.main === module) {
     console.log('🚀 Arena AI starting...');
     start().catch((e) => { log('Startup fail: ' + e.message); process.exit(1); });

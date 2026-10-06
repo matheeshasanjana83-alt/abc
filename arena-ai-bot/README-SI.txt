@@ -1,4 +1,4 @@
-Arena AI v2.2 — ඔයාට විතරක් වැඩ කරන WhatsApp bot එක (AI + Downloader)
+Arena AI v2.3 — ඔයාට විතරක් වැඩ කරන WhatsApp bot එක (AI + Downloader)
 =====================================================================
 Commands ("Message yourself" chat එකේ ගහන්න):
   .ai <ප්‍රශ්නය>             AI එකෙන් අහන්න (සිංහල OK). කලින් කතාව මතක තියාගන්නවා (පණිවිඩ 10ක්)
@@ -21,6 +21,10 @@ Download support: direct links, GitHub, Google Drive (public), MediaFire, MEGA, 
 litterbox/catbox, x0.at, transfer.archivete.am, filebin. (gofile / LimeWire / folders support නෑ). Max 2 GB.
 
 🔒 Private: ඔයා යවන messages විතරයි. වෙන අය commands යැව්වත් ignore.
+
+v2.3 fix: bot එකේ replies phone එකේ "Waiting for this message" කියලා පෙන්නපු එක.
+  Baileys v7 self-chat messages වලට device/LID jid එකක් (35189...:0@lid) දෙනවා; ඒකට reply කළාම phone එකට decrypt
+  කරන්න බෑ. දැන් self-chat replies හැම වෙලාවෙම ඔයාගේ phone-number JID (94...@s.whatsapp.net) එකට යනවා.
 
 v2.2 — .update command:
   .update          GitHub (matheeshasanjana83-alt/abc → arena-ai-bot/) එකෙන් අලුත් files අරන් auto restart.

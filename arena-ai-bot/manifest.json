@@ -1,5 +1,18 @@
 {
-  "version": "2.2.0",
-  "notes": ".update command (GitHub auto-update, pair කරන්න ඕනේ නෑ) + auto rollback",
-  "files": ["bot.js", "ai.js", "downloader.js", "resolvers.js", "updater.js", "launcher.js", "package.json", "termux-setup.sh", "test.js", "README-SI.txt", "manifest.json", ".gitignore"]
+  "version": "2.3.0",
+  "notes": "Self-chat replies \"Waiting for this message\" fix: replies go to your phone-number JID (not device/LID jid)",
+  "files": [
+    "bot.js",
+    "ai.js",
+    "downloader.js",
+    "resolvers.js",
+    "updater.js",
+    "launcher.js",
+    "package.json",
+    "termux-setup.sh",
+    "test.js",
+    "README-SI.txt",
+    "manifest.json",
+    ".gitignore"
+  ]
 }
