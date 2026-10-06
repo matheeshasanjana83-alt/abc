@@ -1,6 +1,6 @@
 {
-  "version": "2.4.3",
-  "notes": "Panel pairing: number saved (auto new code on expiry), clearer errors, status server on SERVER_PORT",
+  "version": "2.4.4",
+  "notes": "Download errors now show the real network reason (blocked IP, DNS, timeout) + 1 retry",
   "files": [
     "bot.js",
     "ai.js",

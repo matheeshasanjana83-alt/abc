@@ -9,6 +9,36 @@ const TMP = process.env.DL_TMP || os.tmpdir();
 
 const human = (b) => !b ? '?' : b >= 1073741824 ? (b / 1073741824).toFixed(2) + ' GB' : b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
 
+
+// "fetch failed" hides the real reason → show it (and retry once for flaky network errors)
+function explainNetErr(e, url) {
+    const c = e?.cause?.code || e?.code || '';
+    const host = (() => { try { return new URL(url).hostname; } catch { return 'site'; } })();
+    const why = {
+        ECONNRESET: `${host} server එක connection එක කැපුවා — බොහෝවිට site එක server/datacenter IP block කරනවා`,
+        ECONNREFUSED: `${host} connection එක reject කළා`,
+        ETIMEDOUT: `${host} වලට connect වෙන්න බැරි වුණා (timeout) — site එක මේ server එක block කරලා වෙන්න පුළුවන්`,
+        UND_ERR_CONNECT_TIMEOUT: `${host} වලට connect වෙන්න බැරි වුණා (timeout) — site එක මේ server එක block කරලා වෙන්න පුළුවන්`,
+        ENOTFOUND: `${host} හොයාගන්න බෑ (DNS) — server එකේ DNS එක ${host} block කරනවා හෝ link එක වැරදියි`,
+        EAI_AGAIN: `DNS error (${host}) — ටිකකින් ආයෙත් try කරන්න`,
+        UND_ERR_SOCKET: `${host} connection එක මැදින් කැඩුණා — site එක server IP block කරනවා වෙන්න පුළුවන්`,
+        CERT_HAS_EXPIRED: `${host} SSL certificate එක expire වෙලා`,
+        UNABLE_TO_VERIFY_LEAF_SIGNATURE: `${host} SSL certificate error`,
+    }[c];
+    const err = new Error((why || `network error: ${e?.cause?.message || e.message}`) + (c ? ` [${c}]` : ''));
+    err.code = c; return err;
+}
+async function fetchExplained(url, opts) {
+    for (let i = 0; ; i++) {
+        try { return await fetch(url, opts); }
+        catch (e) {
+            const c = e?.cause?.code || e?.code || '';
+            if (i < 1 && /ECONNRESET|UND_ERR_SOCKET|EAI_AGAIN|ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT/.test(c)) { await new Promise(r => setTimeout(r, 2000)); continue; }
+            throw explainNetErr(e, url);
+        }
+    }
+}
+
 function safeName(n) {
     n = String(n || '').replace(/[\/\\?%*:|"<>\x00-\x1f]/g, '_').trim();
     return n.slice(0, 180) || 'file';
@@ -44,7 +74,7 @@ async function streamToFile(stream, dest, total, onProgress) {
 async function httpGet(url, ua, referer) {
     const headers = { 'User-Agent': ua, 'Accept': '*/*' };
     if (referer) headers.Referer = referer;
-    return fetch(url, { headers, redirect: 'follow' });
+    return fetchExplained(url, { headers, redirect: 'follow' });
 }
 
 async function downloadHttp(r, dest, onProgress) {
@@ -100,4 +130,4 @@ async function download(link, onProgress) {
     } catch (e) { fs.rm(dest, { force: true }, () => { }); throw e; }
 }
 
-module.exports = { download, human, MAX_BYTES };
+module.exports = { explainNetErr, download, human, MAX_BYTES };
