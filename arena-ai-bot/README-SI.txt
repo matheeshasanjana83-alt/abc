@@ -22,6 +22,9 @@ litterbox/catbox, x0.at, transfer.archivete.am, filebin. (gofile / LimeWire / fo
 
 🔒 Private: ඔයා යවන messages විතරයි. වෙන අය commands යැව්වත් ignore.
 
+v2.5 — Updates දැන් එන්නේ අලුත් repo එකෙන්: https://github.com/matheeshasanjana83-alt/Arena-Ai-WA-BOT
+  (.update / .version ඒ විදියටම. Panel එකේත් වැඩ — launcher එක bot එක auto restart කරනවා.)
+
 v2.4 — Server/panel (HeavenCloud) support:
   index.js = panel entry (npm start එකමයි). Panel එකේ temp files server disk එකේ (.tmp), file limit 350MB.
   Phone number එක settings.json එකේ "phone" විදියටත් දාන්න පුළුවන්. Panel zip: Arena-AI-panel.zip (files root එකේ).

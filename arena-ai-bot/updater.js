@@ -7,8 +7,8 @@ const path = require('path');
 const vm = require('vm');
 const { spawn } = require('child_process');
 
-const REPO = process.env.UPDATE_REPO || 'matheeshasanjana83-alt/abc';
-const DIR = process.env.UPDATE_DIR || 'arena-ai-bot';
+const REPO = process.env.UPDATE_REPO || 'matheeshasanjana83-alt/Arena-Ai-WA-BOT';
+const DIR = (process.env.UPDATE_DIR ?? '').replace(/^\/+|\/+$/g, '');   // '' = repo root
 const BRANCH = process.env.UPDATE_BRANCH || 'main';
 const ROOT = __dirname;
 const VERSION_FILE = path.join(ROOT, '.version.json');
@@ -19,7 +19,7 @@ const UA = { 'User-Agent': 'arena-ai-bot-updater', Accept: 'application/vnd.gith
 const localInfo = () => { try { return JSON.parse(fs.readFileSync(VERSION_FILE, 'utf8')); } catch { return { version: require('./package.json').version, sha: null }; } };
 
 async function latest() {
-    const r = await fetch(`https://api.github.com/repos/${REPO}/commits?sha=${BRANCH}&path=${DIR}&per_page=1`, { headers: UA });
+    const r = await fetch(`https://api.github.com/repos/${REPO}/commits?sha=${BRANCH}${DIR ? '&path=' + DIR : ''}&per_page=1`, { headers: UA });
     if (!r.ok) throw new Error(`GitHub ${r.status} (ටිකකින් ආයෙත් try කරන්න)`);
     const c = (await r.json())[0];
     if (!c) throw new Error('update repo එකේ files නෑ');
@@ -28,7 +28,7 @@ async function latest() {
 }
 
 async function fetchRaw(sha, file) {
-    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/${sha}/${DIR}/${file}`, { headers: { 'User-Agent': UA['User-Agent'] } });
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/${sha}/${DIR ? DIR + '/' : ''}${file}`, { headers: { 'User-Agent': UA['User-Agent'] } });
     if (!r.ok) throw new Error(`${file} download fail (${r.status})`);
     return Buffer.from(await r.arrayBuffer());
 }
