@@ -1,6 +1,6 @@
 {
-  "version": "2.4.0",
-  "notes": "Server/panel support (HeavenCloud): index.js entry, temp files on server disk, 350MB limit on panel, phone from settings.json",
+  "version": "2.4.1",
+  "notes": "settings.json \"maxMB\" = download size limit (eg 2000 on big panels)",
   "files": [
     "bot.js",
     "ai.js",

@@ -8,7 +8,9 @@
         _fs.mkdirSync(t, { recursive: true });
         process.env.TMPDIR = t; process.env.TMP = t; process.env.DL_TMP = t;
     }
-    if (onPanel && !process.env.DL_MAX_MB) process.env.DL_MAX_MB = '350';   // 1 GB disk: file + encrypted copy
+    let _maxMB = ''; try { _maxMB = String(JSON.parse(_fs.readFileSync(_path.join(__dirname, 'settings.json'), 'utf8')).maxMB || ''); } catch { }
+    if (!process.env.DL_MAX_MB && /^\d+$/.test(_maxMB)) process.env.DL_MAX_MB = _maxMB;   // settings.json {"maxMB": 2000}
+    if (onPanel && !process.env.DL_MAX_MB) process.env.DL_MAX_MB = '350';   // small free panels: file + encrypted copy
     process.env.ARENA_ON_PANEL = onPanel ? '1' : '';
 }
 /**
