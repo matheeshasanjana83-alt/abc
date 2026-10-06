@@ -1,6 +1,6 @@
 {
-  "version": "2.3.0",
-  "notes": "Self-chat replies \"Waiting for this message\" fix: replies go to your phone-number JID (not device/LID jid)",
+  "version": "2.4.0",
+  "notes": "Server/panel support (HeavenCloud): index.js entry, temp files on server disk, 350MB limit on panel, phone from settings.json",
   "files": [
     "bot.js",
     "ai.js",
@@ -13,6 +13,7 @@
     "test.js",
     "README-SI.txt",
     "manifest.json",
-    ".gitignore"
+    ".gitignore",
+    "index.js"
   ]
 }

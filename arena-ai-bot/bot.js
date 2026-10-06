@@ -1,3 +1,16 @@
+// ── Panel (Pterodactyl: HeavenCloud etc.) support ── must run before anything uses os.tmpdir()
+{
+    const _fs = require('fs'), _path = require('path');
+    const onPanel = !!process.env.P_SERVER_UUID || process.cwd() === '/home/container' || process.env.ARENA_PANEL === '1';
+    if (onPanel && !process.env.DL_TMP) {
+        const t = _path.join(__dirname, '.tmp');           // container /tmp is a tiny tmpfs → use server disk
+        try { _fs.rmSync(t, { recursive: true, force: true }); } catch { }
+        _fs.mkdirSync(t, { recursive: true });
+        process.env.TMPDIR = t; process.env.TMP = t; process.env.DL_TMP = t;
+    }
+    if (onPanel && !process.env.DL_MAX_MB) process.env.DL_MAX_MB = '350';   // 1 GB disk: file + encrypted copy
+    process.env.ARENA_ON_PANEL = onPanel ? '1' : '';
+}
 /**
  * Arena AI — private WhatsApp bot:  .ai <question>  +  .download <link> [link2 ...]
  * Works only for YOU (messages you send). Others are ignored silently.
@@ -19,7 +32,8 @@ const msgStore = new Map();          // recent messages → getMessage() for ret
 const seen = new Set();              // processed message ids (dedupe notify/append)
 const STARTED = Math.floor(Date.now() / 1000);
 let announced = false;
-const ME = { pn: null, lid: null };   // our own JIDs (set on connect)
+const ME = { pn: null, lid: null };
+function readSettingsPhone() { try { return JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'settings.json'), 'utf8')).phone || ''; } catch { return ''; } }   // our own JIDs (set on connect)
 
 // strip device part:  "9476xxxx:12@s.whatsapp.net" → "9476xxxx@s.whatsapp.net"
 const bareJid = (j) => { if (!j) return j; const [u, srv] = String(j).split('@'); return u.split(':')[0] + '@' + srv; };
@@ -107,7 +121,7 @@ async function start() {
     sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
         if (qr && !sock.authState.creds.registered && !pairingAsked) {
             pairingAsked = true;
-            let num = String(process.env.WA_PHONE_NUMBER || '').replace(/\D/g, '');
+            let num = String(process.env.WA_PHONE_NUMBER || readSettingsPhone() || '').replace(/\D/g, '');
             if (!num) num = String(await ask('📱 ඔයාගේ WhatsApp number එක (උදා 94771234567): ')).replace(/\D/g, '');
             if (num.startsWith('0')) num = '94' + num.slice(1);
             try {

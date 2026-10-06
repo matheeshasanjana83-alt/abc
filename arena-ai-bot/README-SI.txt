@@ -22,6 +22,10 @@ litterbox/catbox, x0.at, transfer.archivete.am, filebin. (gofile / LimeWire / fo
 
 🔒 Private: ඔයා යවන messages විතරයි. වෙන අය commands යැව්වත් ignore.
 
+v2.4 — Server/panel (HeavenCloud) support:
+  index.js = panel entry (npm start එකමයි). Panel එකේ temp files server disk එකේ (.tmp), file limit 350MB.
+  Phone number එක settings.json එකේ "phone" විදියටත් දාන්න පුළුවන්. Panel zip: Arena-AI-panel.zip (files root එකේ).
+
 v2.3 fix: bot එකේ replies phone එකේ "Waiting for this message" කියලා පෙන්නපු එක.
   Baileys v7 self-chat messages වලට device/LID jid එකක් (35189...:0@lid) දෙනවා; ඒකට reply කළාම phone එකට decrypt
   කරන්න බෑ. දැන් self-chat replies හැම වෙලාවෙම ඔයාගේ phone-number JID (94...@s.whatsapp.net) එකට යනවා.
