@@ -1,4 +1,4 @@
-Arena AI v2.1 — ඔයාට විතරක් වැඩ කරන WhatsApp bot එක (AI + Downloader)
+Arena AI v2.2 — ඔයාට විතරක් වැඩ කරන WhatsApp bot එක (AI + Downloader)
 =====================================================================
 Commands ("Message yourself" chat එකේ ගහන්න):
   .ai <ප්‍රශ්නය>             AI එකෙන් අහන්න (සිංහල OK). කලින් කතාව මතක තියාගන්නවා (පණිවිඩ 10ක්)
@@ -21,6 +21,14 @@ Download support: direct links, GitHub, Google Drive (public), MediaFire, MEGA, 
 litterbox/catbox, x0.at, transfer.archivete.am, filebin. (gofile / LimeWire / folders support නෑ). Max 2 GB.
 
 🔒 Private: ඔයා යවන messages විතරයි. වෙන අය commands යැව්වත් ignore.
+
+v2.2 — .update command:
+  .update          GitHub (matheeshasanjana83-alt/abc → arena-ai-bot/) එකෙන් අලුත් files අරන් auto restart.
+                   auth/ (WhatsApp link) + settings.json (API keys) කවදාවත් වෙනස් කරන්නේ නෑ → pair කරන්න ඕනේ නෑ.
+  .update force    එකම version එක ආයෙත් install කරන්න
+  .version         දැන් version එක + update තියෙනවද
+  • අලුත් files වල error එකක් තිබ්බොත් install කරන්නේම නෑ. Install වුණාට පස්සේ crash වුණොත් පරණ version එකට auto rollback.
+  • Auto restart වෙන්න bot එක *npm start* එකෙන් start කරන්න ඕනේ (launcher.js).
 
 v2.1 fix (commands වැඩ නොකළ ප්‍රශ්නය):
   • Baileys 6.7 (legacy) → 7.0.0-rc14. WhatsApp LID ක්‍රමයට මාරු වුණු නිසා 6.7 ට ඔයාගේ phone එකෙන් එන
